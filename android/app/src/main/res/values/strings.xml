@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mero Sewa</string>
+    <string name="facebook_app_id">281532893790952</string>
+    <string name="facebook_client_token">64b6346bff67dfde503684f1b683e1b9</string>
+    <string name="fb_login_protocol_scheme">fb281532893790952</string>
+</resources>

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "420053243451",
+    "project_id": "mero-sewa-d4bfc",
+    "storage_bucket": "mero-sewa-d4bfc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420053243451:android:07d24313accee1eef36e1e",
+        "android_client_info": {
+          "package_name": "com.example.merosewa_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420053243451-pa11i7dog1o205t9dmj1fcq0ih5sllfh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.merosewa_app",
+            "certificate_hash": "08f915ca8eb4c93e87d3c595742f99118685a452"
+          }
+        },
+        {
+          "client_id": "420053243451-7ljdgufj49lrann3f9lrvqa033040av2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwz8V756cjPZli5HY1eO1KOPQe76CNejo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420053243451-7ljdgufj49lrann3f9lrvqa033040av2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
