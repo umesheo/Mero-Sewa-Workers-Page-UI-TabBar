@@ -19,6 +19,7 @@ class PlumbersList extends StatefulWidget {
 
 class _PlumbersListState extends State<PlumbersList>
     with TickerProviderStateMixin {
+  TabController? _controller;
   Position? currentPosition;
   bool loading = true;
   //to store latitude and longitude
@@ -31,6 +32,8 @@ class _PlumbersListState extends State<PlumbersList>
   List<Data> dataList = [];
   bool dataExists = false;
 
+  int _currentTabIndex = 0;
+
   late Geolocator geoLocator;
   bool permissionError = false;
   //Location currentLocation =  Location();
@@ -42,10 +45,10 @@ class _PlumbersListState extends State<PlumbersList>
     //get the current position of user
     getPosition();
     //locationPosition();
-    DataAll();
 
     //fetchData();
     super.initState();
+    _controller = TabController(vsync: this, length: 2);
   }
 
   //Creating route to smoothly navigate to pages
@@ -229,43 +232,7 @@ class _PlumbersListState extends State<PlumbersList>
       //print("Snapshot Value${snapshot.value}");
       print(dataList[0].databaseAddress);
     });
-    //return the data list
-    return dataList;
-  }
 
-  DataAll() async {
-    //creating a database reference
-    DatabaseReference referenceData = FirebaseDatabase.instance.reference();
-
-    //getting the data from database were address is
-    //equals to users current location
-    await referenceData.child("Workers").once().then((DataSnapshot snapshot) {
-      //clear the previous stored datalist
-      dataList.clear();
-
-      //getting the keys (index) and values from snapshot
-      var keys = snapshot.value.keys;
-      var values = snapshot.value;
-
-      for (var key in keys) {
-        //if category is plumber
-        if (values[key]["Category"] == "Plumber") {
-          //fetch all data of the plumbers from database
-          //who are nearby the current location of the user
-          //and add to Data class constructor
-          Data data = new Data(
-              values[key]["Category"],
-              values[key]["Name"],
-              values[key]["Address"],
-              values[key]["PhoneNumber"],
-              values[key]["URL"]);
-          //then add the value to the data list
-          dataList.add(data);
-        }
-      }
-      //print("Snapshot Value${snapshot.value}");
-      print(dataList[0].databaseAddress);
-    });
     //return the data list
     return dataList;
   }
@@ -273,7 +240,7 @@ class _PlumbersListState extends State<PlumbersList>
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    TabController _tabController = TabController(length: 2, vsync: this);
+    TabController _controller = TabController(vsync: this, length: 2);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFFFFFFF),
@@ -309,7 +276,7 @@ class _PlumbersListState extends State<PlumbersList>
                   top: MediaQuery.of(context).size.height * 0.1),
               child: Container(
                 child: TabBar(
-                  controller: _tabController,
+                  controller: _controller,
                   isScrollable: true,
                   padding: EdgeInsets.only(left: 20, right: 20),
                   labelColor: Colors.black,
@@ -330,7 +297,7 @@ class _PlumbersListState extends State<PlumbersList>
             ),
             Container(
               child: TabBarView(
-                controller: _tabController,
+                controller: _controller,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 150.0),
@@ -518,119 +485,7 @@ class _PlumbersListState extends State<PlumbersList>
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 150.0),
-                    child: Container(
-                      child: FutureBuilder(
-                        future: DataAll(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData && loading == false)
-                            return ListView.builder(
-                                physics: BouncingScrollPhysics(),
-                                itemCount: dataList.length,
-                                itemBuilder: (_, index) {
-                                  return GestureDetector(
-                                      onTap: () {
-                                        //navigate to Plumber Details page with the all data
-                                        Navigator.of(context).push(_createRoute(
-                                            PlumberDetails(
-                                                category: dataList[index]
-                                                    .databaseCategory!,
-                                                name: dataList[index]
-                                                    .databaseName!,
-                                                address: dataList[index]
-                                                    .databaseAddress!,
-                                                phoneNumber: dataList[index]
-                                                    .phoneNumber!,
-                                                photoURL: dataList[index]
-                                                    .photoURL!)));
-                                      },
-
-                                      //displaying the data in card lists
-                                      //include the details required in the lisitng page
-                                      child: cardUI(
-                                          dataList[index].databaseName,
-                                          dataList[index].databaseAddress,
-                                          dataList[index].databaseCategory,
-                                          dataList[index].phoneNumber,
-                                          dataList[index].photoURL));
-                                });
-                          else if (snapshot.hasError && loading == false)
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  //if address is empty
-                                  //i.e if the location permission is denied
-                                  //or location is off
-
-                                  //display a message
-
-                                  //else if location is on and no workers is found nearby the location
-                                  Container(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "No plumbers found nearby",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontFamily: 'Pacifico',
-                                              fontWeight: FontWeight.w300,
-                                              fontSize: 20),
-                                        ),
-                                        SizedBox(height: size.height * 0.03),
-                                        Lottie.asset(
-                                          'assets/norecordsfound.json',
-                                          width: size.width * 0.80,
-                                          height: size.height * 0.20,
-                                        ),
-                                        SizedBox(height: size.height * 0.03),
-                                        Text(
-                                            "We're sorry to inform you that \n  no plumbers were found nearby \n $address",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w300,
-                                                fontSize: 18)),
-                                        SizedBox(height: size.height * 0.05),
-                                        Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Text(
-                                              "Please go to All Plumbers page to \n view all the plumbers available in \n other locations ",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w300,
-                                                  fontSize: 16)),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  /*
-                      Text(
-                          "Longitude:${currentPosition!.longitude} Latitude: ${currentPosition!.latitude}")*/
-                                  //print entire location data
-                                  //Text(placemark.toString())
-                                ],
-                              ),
-                            );
-                          /*
-                    else if (dataList.isEmpty && loading == false)
-                    return Text("No data foundsss");
-                    */
-                          else
-                            return Container(
-                              margin: EdgeInsets.symmetric(vertical: 20),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      kPrimaryColor),
-                                ),
-                              ),
-                            );
-                        },
-                      ),
-                    ),
-                  )
+                  AllWorker()
                 ],
               ),
             ),
@@ -639,6 +494,314 @@ class _PlumbersListState extends State<PlumbersList>
   }
 
   //card list design
+  Widget cardUI(String? name, String? address, String? category,
+      String? phoneNumber, String? photoURL) {
+    return Container(
+      margin: EdgeInsets.only(right: 20, left: 20, top: 25),
+      decoration: BoxDecoration(
+        border: Border.all(width: 0, color: Color(0xFFFFFFFF)),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(blurRadius: 10, color: Colors.grey)],
+        color: Color(0xFFFFFFFF),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 10, left: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          color: Colors.cyan,
+                          size: 20,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          name!,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width / 2.2,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_pin,
+                            color: Colors.cyan,
+                            size: 20,
+                          ),
+                          Text(
+                            address!,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.category,
+                          color: Colors.cyan,
+                          size: 20,
+                        ),
+                        Text(
+                          category!,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.cyan,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        )),
+                    child: Icon(Icons.info, size: 20),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Expanded(
+            child: Container(
+              transform: Matrix4.translationValues(20.0, 25.0, 0.0),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.cyan,
+                child: ClipOval(
+                  child: Image.network(
+                    photoURL!,
+                    width: MediaQuery.of(context).size.width / 5.9,
+                    height: MediaQuery.of(context).size.height / 5.8,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AllWorker extends StatefulWidget {
+  AllWorker({Key? key}) : super(key: key);
+
+  @override
+  _AllWorkerState createState() => _AllWorkerState();
+}
+
+class _AllWorkerState extends State<AllWorker> {
+  List<Data> dataList = [];
+  bool dataExists = false;
+  @override
+  void initState() {
+    //check for location permissions
+
+    //locationPosition();
+    fetchDataAll();
+    //fetchData();
+    super.initState();
+  }
+
+  Route _createRoute(pages) {
+    return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) => pages,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        final tween = Tween(begin: begin, end: end);
+        final offsetAnimation = animation.drive(tween);
+        //animation = CurvedAnimation(parent: animation, curve: Curves.bounceIn);
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+
+  fetchDataAll() async {
+    //creating a database reference
+    DatabaseReference referenceData = FirebaseDatabase.instance.reference();
+
+    //getting the data from database were address is
+    //equals to users current location
+    await referenceData
+        .child("Workers")
+        //and order by to display all workers
+        .once()
+        .then((DataSnapshot snapshot) {
+      //clear the previous stored datalist
+      dataList.clear();
+
+      //getting the keys (index) and values from snapshot
+      var keys = snapshot.value.keys;
+      var values = snapshot.value;
+
+      for (var key in keys) {
+        //if category is plumber
+        if (values[key]["Category"] == "Plumber") {
+          //fetch all data of the plumbers from database
+          //who are nearby the current location of the user
+          //and add to Data class constructor
+          Data data = new Data(
+              values[key]["Category"],
+              values[key]["Name"],
+              values[key]["Address"],
+              values[key]["PhoneNumber"],
+              values[key]["URL"]);
+          //then add the value to the data list
+          dataList.add(data);
+        }
+      }
+      //print("Snapshot Value${snapshot.value}");
+      print(dataList[0].databaseAddress);
+    });
+
+    //return the data list
+    return dataList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Padding(
+      padding: const EdgeInsets.only(top: 150.0),
+      child: Container(
+        child: FutureBuilder(
+          future: fetchDataAll(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData)
+              return ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  itemCount: dataList.length,
+                  itemBuilder: (_, index) {
+                    return GestureDetector(
+                        onTap: () {
+                          //navigate to Plumber Details page with the all data
+                          Navigator.of(context).push(_createRoute(
+                              PlumberDetails(
+                                  category: dataList[index].databaseCategory!,
+                                  name: dataList[index].databaseName!,
+                                  address: dataList[index].databaseAddress!,
+                                  phoneNumber: dataList[index].phoneNumber!,
+                                  photoURL: dataList[index].photoURL!)));
+                        },
+
+                        //displaying the data in card lists
+                        //include the details required in the lisitng page
+                        child: cardUI(
+                            dataList[index].databaseName,
+                            dataList[index].databaseAddress,
+                            dataList[index].databaseCategory,
+                            dataList[index].phoneNumber,
+                            dataList[index].photoURL));
+                  });
+            else if (snapshot.hasError)
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //if address is empty
+                    //i.e if the location permission is denied
+                    //or location is off
+
+                    //display a message
+
+                    //else if location is on and no workers is found nearby the location
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "No plumbers found.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Lottie.asset(
+                            'assets/norecordsfound.json',
+                            width: size.width * 0.80,
+                            height: size.height * 0.20,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text(
+                              "We're sorry to inform you that \n at this moment we don't have any plumbers.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Text("Please visit after a while. ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 16)),
+                          ),
+                        ],
+                      ),
+                    )
+                    /*
+                      Text(
+                          "Longitude:${currentPosition!.longitude} Latitude: ${currentPosition!.latitude}")*/
+                    //print entire location data
+                    //Text(placemark.toString())
+                  ],
+                ),
+              );
+            /*
+                    else if (dataList.isEmpty && loading == false)
+                    return Text("No data foundsss");
+                    */
+            else
+              return Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                  ),
+                ),
+              );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget cardUI(String? name, String? address, String? category,
       String? phoneNumber, String? photoURL) {
     return Container(
