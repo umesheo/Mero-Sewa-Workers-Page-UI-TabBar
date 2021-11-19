@@ -320,27 +320,30 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
                     children: [
                       if (!_isKeyboardOpen)
                         Padding(
-                            padding: EdgeInsets.only(
-                          top: size.height * 0.20,
-                        )),
+                          padding: EdgeInsets.only(
+                            top: size.height * 0.20,
+                          ),
+                          child: Image.asset(
+                            "assets/images/Logo.png",
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+
                       if (_isKeyboardOpen)
                         Padding(
-                            padding: EdgeInsets.only(
-                          top: size.height * 0.04,
-                        )),
-                      Image.asset(
-                        "assets/images/Logo.png",
-                        width: 100,
-                        height: 100,
-                      ),
-                      Text(
-                        'Mero Sewa',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Pacifico',
-                          fontSize: 35,
+                          padding: EdgeInsets.only(
+                            top: size.height * 0.04,
+                          ),
+                          child: Text(
+                            'Mero Sewa',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Pacifico',
+                              fontSize: 35,
+                            ),
+                          ),
                         ),
-                      ),
                       if (!_isKeyboardOpen)
                         Padding(
                             padding: EdgeInsets.only(
@@ -602,7 +605,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
                             ],
                           )),
                       if (!_isKeyboardOpen)
-                        SizedBox(height: size.height * 0.100),
+                        SizedBox(height: size.height * 0.0543),
                       if (_isKeyboardOpen) SizedBox(height: size.height * 0.05),
                       //creating don't have an account text button
                       Container(

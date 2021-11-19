@@ -8,7 +8,7 @@ import 'package:merosewa_app/Screens/HomePage/workers_tile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:merosewa_app/Screens/Profile/profile.dart';
-import 'package:merosewa_app/Screens/Workers/Plumbers/plumbersList.dart';
+import 'package:merosewa_app/Screens/Workers/Plumbers/tabBar.dart';
 import 'package:merosewa_app/constants.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:lottie/lottie.dart';
@@ -231,7 +231,7 @@ class HomeScreenState extends State<HomeScreen> {
                                                   0), // changes position of shadow
                                             ),
                                           ],
-                                          color: Colors.cyan,
+                                          color: kPrimaryColor,
                                           borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(20),
                                             bottomLeft: Radius.circular(20),
@@ -297,7 +297,7 @@ class HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 1),
+                SizedBox(height: 0),
                 //_buildCategories(),
                 _buildWorkersCard()
               ],
@@ -382,7 +382,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Container(
       child: Padding(
         //padding: const EdgeInsets.all(15.0),
-        padding: EdgeInsets.only(top: 10, bottom: 20, right: 15, left: 15),
+        padding: EdgeInsets.only(top: 0, bottom: 20, right: 15, left: 15),
         child: Container(
           //color: kPrimaryColor,
           /*
@@ -407,8 +407,8 @@ class HomeScreenState extends State<HomeScreen> {
           //Color(0xffffffff), //Colors.grey.shade100,  //Color(0xffffffff),
           child: Padding(
             padding: const EdgeInsets.only(
-              top: 20,
-              bottom: 20,
+              top: 0,
+              //bottom: 20,
               //right: 20,
               //left: 20,
               //right: 15,
@@ -477,7 +477,7 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 25,
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
@@ -501,7 +501,7 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
@@ -533,7 +533,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   //if internet connection is available
                                   if (connection == true) {
                                     Navigator.of(context)
-                                        .push(_createRoute(PlumbersList()));
+                                        .push(_createRoute(TabBarPage()));
                                   }
                                   //else if internet connection is not available
                                   else if (connection == false) {
