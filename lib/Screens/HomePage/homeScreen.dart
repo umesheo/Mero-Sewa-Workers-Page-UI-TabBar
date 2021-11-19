@@ -11,6 +11,7 @@ import 'package:merosewa_app/Screens/Profile/profile.dart';
 import 'package:merosewa_app/Screens/Workers/Plumbers/plumbersList.dart';
 import 'package:merosewa_app/constants.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:lottie/lottie.dart';
 
 //class to display home screen
 class HomeScreen extends StatefulWidget {
@@ -296,7 +297,7 @@ class HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 1),
                 //_buildCategories(),
                 _buildWorkersCard()
               ],
@@ -417,6 +418,67 @@ class HomeScreenState extends State<HomeScreen> {
             child: Container(
               child: Column(
                 children: <Widget>[
+                  Container(
+                    height: 100,
+                    width: 400,
+                    decoration: BoxDecoration(
+                      color: Colors.cyan[300],
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 8.0,
+                        left: 15,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Text("Indroducing",
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 14)),
+                                    Text("Mero Sewa",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text("Find your workers easily now!",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Lottie.asset(
+                                  'assets/searching.json',
+                                  width: 150,
+                                  height: 90,
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Container(
                     width: MediaQuery.of(context).size.width,
                     child: Row(
@@ -544,7 +606,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   child: WorkersTile(
                                     color:
                                         Color(0xffDFECF8), // Color(0xffffffff),
-                                    assetPath: 'assets/images/mechanic.png',
+                                    assetPath: 'assets/images/painter.png',
                                     title: 'Painters',
                                   ),
                                 ),
@@ -558,8 +620,8 @@ class HomeScreenState extends State<HomeScreen> {
                                   child: WorkersTile(
                                     color:
                                         Color(0xffDFECF8), // Color(0xffffffff),
-                                    assetPath: 'assets/images/mechanic.png',
-                                    title: 'Furniture',
+                                    assetPath: 'assets/images/carpenter.png',
+                                    title: 'Carpenter',
                                   ),
                                 ),
                               ),
@@ -572,7 +634,8 @@ class HomeScreenState extends State<HomeScreen> {
                                   child: WorkersTile(
                                     color:
                                         Color(0xffDFECF8), //Color(0xffffffff),
-                                    assetPath: 'assets/images/electrician.png',
+                                    assetPath: 'assets/images/cleaner.png',
+
                                     title: 'Cleaners',
                                   ),
                                 ),

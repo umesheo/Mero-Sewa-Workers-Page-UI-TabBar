@@ -307,36 +307,61 @@ class _PlumbersListState extends State<PlumbersList>
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData && loading == false)
-                            return ListView.builder(
-                                physics: BouncingScrollPhysics(),
-                                itemCount: dataList.length,
-                                itemBuilder: (_, index) {
-                                  return GestureDetector(
-                                      onTap: () {
-                                        //navigate to Plumber Details page with the all data
-                                        Navigator.of(context).push(_createRoute(
-                                            PlumberDetails(
-                                                category: dataList[index]
-                                                    .databaseCategory!,
-                                                name: dataList[index]
-                                                    .databaseName!,
-                                                address: dataList[index]
-                                                    .databaseAddress!,
-                                                phoneNumber: dataList[index]
-                                                    .phoneNumber!,
-                                                photoURL: dataList[index]
-                                                    .photoURL!)));
-                                      },
+                            return RefreshIndicator(
+                              child: ListView.builder(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  itemCount: dataList.length,
+                                  itemBuilder: (_, index) {
+                                    return GestureDetector(
+                                        onTap: () {
+                                          //navigate to Plumber Details page with the all data
+                                          Navigator.of(context).push(
+                                              _createRoute(PlumberDetails(
+                                                  category: dataList[index]
+                                                      .databaseCategory!,
+                                                  name: dataList[index]
+                                                      .databaseName!,
+                                                  address: dataList[index]
+                                                      .databaseAddress!,
+                                                  phoneNumber: dataList[index]
+                                                      .phoneNumber!,
+                                                  photoURL: dataList[index]
+                                                      .photoURL!)));
+                                        },
 
-                                      //displaying the data in card lists
-                                      //include the details required in the lisitng page
-                                      child: cardUI(
-                                          dataList[index].databaseName,
-                                          dataList[index].databaseAddress,
-                                          dataList[index].databaseCategory,
-                                          dataList[index].phoneNumber,
-                                          dataList[index].photoURL));
-                                });
+                                        //displaying the data in card lists
+                                        //include the details required in the lisitng page
+                                        child: cardUI(
+                                            dataList[index].databaseName,
+                                            dataList[index].databaseAddress,
+                                            dataList[index].databaseCategory,
+                                            dataList[index].phoneNumber,
+                                            dataList[index].photoURL));
+                                  }),
+                              onRefresh: () {
+                                return Future.delayed(
+                                  Duration(seconds: 1),
+                                  () {
+                                    /// adding elements in list after [1 seconds] delay
+                                    /// to mimic network call
+                                    ///
+                                    /// Remember: setState is necessary so that
+                                    /// build method will run again otherwise
+                                    /// list will not show all elements
+                                    setState(() {
+                                      _determinePermissions();
+                                      //get the current position of user
+                                      getPosition();
+                                      fetchData();
+                                      //locationPosition();
+                                    });
+
+                                    // showing snackbar
+                                  },
+                                );
+                              },
+                            );
                           else if (snapshot.hasError && loading == false)
                             return Center(
                               child: Column(
@@ -704,31 +729,52 @@ class _AllWorkerState extends State<AllWorker> {
           future: fetchDataAll(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData)
-              return ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  itemCount: dataList.length,
-                  itemBuilder: (_, index) {
-                    return GestureDetector(
-                        onTap: () {
-                          //navigate to Plumber Details page with the all data
-                          Navigator.of(context).push(_createRoute(
-                              PlumberDetails(
-                                  category: dataList[index].databaseCategory!,
-                                  name: dataList[index].databaseName!,
-                                  address: dataList[index].databaseAddress!,
-                                  phoneNumber: dataList[index].phoneNumber!,
-                                  photoURL: dataList[index].photoURL!)));
-                        },
+              return RefreshIndicator(
+                child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: dataList.length,
+                    itemBuilder: (_, index) {
+                      return GestureDetector(
+                          onTap: () {
+                            //navigate to Plumber Details page with the all data
+                            Navigator.of(context).push(_createRoute(
+                                PlumberDetails(
+                                    category: dataList[index].databaseCategory!,
+                                    name: dataList[index].databaseName!,
+                                    address: dataList[index].databaseAddress!,
+                                    phoneNumber: dataList[index].phoneNumber!,
+                                    photoURL: dataList[index].photoURL!)));
+                          },
 
-                        //displaying the data in card lists
-                        //include the details required in the lisitng page
-                        child: cardUI(
-                            dataList[index].databaseName,
-                            dataList[index].databaseAddress,
-                            dataList[index].databaseCategory,
-                            dataList[index].phoneNumber,
-                            dataList[index].photoURL));
-                  });
+                          //displaying the data in card lists
+                          //include the details required in the lisitng page
+                          child: cardUI(
+                              dataList[index].databaseName,
+                              dataList[index].databaseAddress,
+                              dataList[index].databaseCategory,
+                              dataList[index].phoneNumber,
+                              dataList[index].photoURL));
+                    }),
+                onRefresh: () {
+                  return Future.delayed(
+                    Duration(seconds: 1),
+                    () {
+                      /// adding elements in list after [1 seconds] delay
+                      /// to mimic network call
+                      ///
+                      /// Remember: setState is necessary so that
+                      /// build method will run again otherwise
+                      /// list will not show all elements
+                      setState(() {
+                        fetchDataAll();
+                        //fetching all workers data on pull or swipe refresh.
+                      });
+
+                      // showing snackbar
+                    },
+                  );
+                },
+              );
             else if (snapshot.hasError)
               return Center(
                 child: Column(
