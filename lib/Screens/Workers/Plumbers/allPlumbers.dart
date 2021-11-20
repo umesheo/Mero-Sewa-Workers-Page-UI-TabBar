@@ -77,7 +77,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
       loading = true;
     });
     try {
-      fetchAllData();
+      await getInternetConnection();
     } finally {
       setState(() {
         loading = false;
@@ -104,7 +104,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
         //if category is plumber
         if (values[key]["Category"] == "Plumber") {
           //fetch all data of the plumbers from database
-          //who are nearby the current location of the user
+
           //and add to Data class constructor
           Data data = new Data(
               values[key]["Category"],

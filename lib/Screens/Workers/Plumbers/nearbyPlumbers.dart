@@ -359,7 +359,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                       child: Column(
                     children: [
                       Text(
-                        "Your location maybe turned off",
+                        "Your location might be turned off",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'Pacifico',
