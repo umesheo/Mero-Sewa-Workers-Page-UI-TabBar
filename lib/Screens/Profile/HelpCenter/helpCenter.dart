@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:merosewa_app/Screens/Profile/HelpCenter/faqs.dart';
 
 import 'package:merosewa_app/constants.dart';
@@ -80,9 +81,11 @@ class HelpCenterState extends State<HelpCenter> {
                         Icon(Icons.ac_unit, color: kPrimarySecondColor),
                         SizedBox(width: 20),
                         Expanded(
-                            child: Text(
-                          "FAQs",
-                        )),
+                            child: Text("FAQs",
+                                style: GoogleFonts.varelaRound(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ))),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: kPrimaryColor,

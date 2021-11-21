@@ -81,7 +81,8 @@ class _PlumberDetailsState extends State<PlumberDetails> {
             appBar: AppBar(
               backgroundColor: Color(0xFFFFFFFF),
               elevation: 0.3,
-              title: Text(name, style: TextStyle(color: kBlackColor)),
+              title: Text(capitalFirst(name),
+                  style: TextStyle(color: kBlackColor)),
             ),
             body: Center(
               child: Container(

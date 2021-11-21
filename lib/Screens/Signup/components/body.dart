@@ -445,6 +445,7 @@ class SignupState extends State<Signup> {
                                   color: Colors.redAccent, fontSize: 10),
                             ),
                             controller: fullNameController,
+                            //autofillHints: [AutofillHints.name],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter name';
@@ -477,6 +478,7 @@ class SignupState extends State<Signup> {
                                   color: Colors.redAccent, fontSize: 10),
                             ),
                             controller: emailController,
+                            //autofillHints: [AutofillHints.email],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter email';

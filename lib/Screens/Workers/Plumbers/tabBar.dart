@@ -122,10 +122,10 @@ class _TabBarPageState extends State<TabBarPage>
                     labelColor: Colors.black,
 
                     indicator: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Colors.cyan, Colors.greenAccent]),
-                        borderRadius: BorderRadius.circular(40),
-                        color: Colors.redAccent),
+                      gradient: LinearGradient(
+                          colors: [Colors.cyan, Colors.greenAccent]),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
                     unselectedLabelColor: Colors.grey,
                     tabs: [
                       Tab(text: "Nearby"),
@@ -184,6 +184,7 @@ class _TabBarPageState extends State<TabBarPage>
                 Expanded(
                   child: TabBarView(
                     controller: controller,
+                    //physics: NeverScrollableScrollPhysics(),
                     children: [NearbyPlumbersLists(), AllPlumbersList()],
                   ),
                 ),

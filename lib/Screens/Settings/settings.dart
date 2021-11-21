@@ -89,7 +89,12 @@ class _SettingsState extends State<Settings> {
                       children: [
                         Icon(Icons.info_outline, color: kPrimarySecondColor),
                         SizedBox(width: 20),
-                        Expanded(child: Text("About Mero Sewa")),
+                        Expanded(
+                            child: Text("About Mero Sewa",
+                                style: GoogleFonts.varelaRound(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ))),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: kPrimaryColor,
@@ -104,7 +109,7 @@ class _SettingsState extends State<Settings> {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      primary: Colors.black,
+                      primary: kBlackColor,
                       padding: EdgeInsets.all(20),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
@@ -118,7 +123,12 @@ class _SettingsState extends State<Settings> {
                         Icon(Icons.message_outlined,
                             color: kPrimarySecondColor),
                         SizedBox(width: 20),
-                        Expanded(child: Text("Feedback")),
+                        Expanded(
+                            child: Text("Feedback",
+                                style: GoogleFonts.varelaRound(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ))),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: kPrimaryColor,
@@ -146,7 +156,12 @@ class _SettingsState extends State<Settings> {
                       children: [
                         Icon(Icons.language, color: kPrimarySecondColor),
                         SizedBox(width: 20),
-                        Expanded(child: Text("Terms & Conditions")),
+                        Expanded(
+                            child: Text("Terms & Conditions",
+                                style: GoogleFonts.varelaRound(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ))),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: kPrimaryColor,
@@ -174,7 +189,12 @@ class _SettingsState extends State<Settings> {
                       children: [
                         Icon(Icons.work_outline, color: kPrimarySecondColor),
                         SizedBox(width: 20),
-                        Expanded(child: Text("Privacy Policy")),
+                        Expanded(
+                            child: Text("Privacy Policy",
+                                style: GoogleFonts.varelaRound(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ))),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: kPrimaryColor,

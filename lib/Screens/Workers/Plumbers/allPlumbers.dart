@@ -23,6 +23,9 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
   String address = "";
   List<Data> dataList = [];
   bool connection = false;
+  final controller = ScrollController();
+  FixedExtentScrollController fixedExtentScrollController =
+      new FixedExtentScrollController();
 
   @override
   void initState() {
@@ -149,164 +152,199 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
     return capitalizedWords.join(' ');
   }
 
+  void scrollUp() {
+    final double start = 0;
+    controller.jumpTo(start);
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-        body: Container(
-      child: FutureBuilder(
-        future: fetchAllData(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData && loading == false)
-            return ListView.builder(
-                physics: BouncingScrollPhysics(),
-                itemCount: dataList.length,
-                itemBuilder: (_, index) {
-                  return GestureDetector(
-                      onTap: () {
-                        //navigate to Plumber Details page with the all data
-                        Navigator.of(context).push(_createRoute(PlumberDetails(
-                            category: dataList[index].databaseCategory!,
-                            name: dataList[index].databaseName!,
-                            address: dataList[index].databaseAddress!,
-                            phoneNumber: dataList[index].phoneNumber!,
-                            photoURL: dataList[index].photoURL!)));
-                      },
-                      //displaying the data in card lists
-                      //include the details required in the lisitng page
-                      child: cardUI(
-                          dataList[index].databaseName,
-                          dataList[index].databaseAddress,
-                          dataList[index].databaseCategory,
-                          dataList[index].phoneNumber,
-                          dataList[index].photoURL));
-                });
-          //else if snapshot has unknown error
-          //and internet connection is also available
-          //but for some reason the address is returned empty
-          else if (snapshot.hasError && connection == true && loading == false)
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            "Something went wrong",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Pacifico',
-                                fontWeight: FontWeight.w300,
-                                fontSize: 20),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Image.asset(
-                            "assets/images/gmail.png",
-                            height: size.height * 0.15,
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Text("An unknown error has occured",
+      body: Container(
+        height: size.height,
+        child: FutureBuilder(
+          future: fetchAllData(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData && loading == false)
+              return ListView.builder(
+                  //controller: controller,
+                  physics: BouncingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: dataList.length,
+                  itemBuilder: (_, index) {
+                    return GestureDetector(
+                        onTap: () {
+                          //navigate to Plumber Details page with the all data
+                          Navigator.of(context).push(_createRoute(
+                              PlumberDetails(
+                                  category: dataList[index].databaseCategory!,
+                                  name: dataList[index].databaseName!,
+                                  address: dataList[index].databaseAddress!,
+                                  phoneNumber: dataList[index].phoneNumber!,
+                                  photoURL: dataList[index].photoURL!)));
+                        },
+                        //displaying the data in card lists
+                        //include the details required in the lisitng page
+                        child: cardUI(
+                            dataList[index].databaseName,
+                            dataList[index].databaseAddress,
+                            dataList[index].databaseCategory,
+                            dataList[index].phoneNumber,
+                            dataList[index].photoURL));
+                  });
+            //else if snapshot has unknown error
+            //and internet connection is also available
+            //but for some reason the address is returned empty
+            else if (snapshot.hasError &&
+                connection == true &&
+                loading == false)
+              return Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Column(
+                          children: [
+                            Text(
+                              "Something went wrong",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 18)),
-                          SizedBox(height: size.height * 0.05),
-                          //Display a reload button
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await getInternetConnection();
-
-                                if (connection == true) {
-                                  loadAllData();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Color(
-                                    0xFFF44336), //Colors.greenAccent.shade400,
-                                //kPrimaryColor,
-                                elevation: 2,
-                                side: BorderSide(color: Colors.white, width: 1),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                ),
-
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: Text(
-                                "RELOAD",
+                                  fontFamily: 'Pacifico',
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 20),
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            Image.asset(
+                              "assets/images/gmail.png",
+                              height: size.height * 0.15,
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            Text("An unknown error has occured",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    letterSpacing: 2.2,
-                                    color: Colors.white),
+                                    fontWeight: FontWeight.w300, fontSize: 18)),
+                            SizedBox(height: size.height * 0.05),
+                            //Display a reload button
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await getInternetConnection();
+
+                                  if (connection == true) {
+                                    loadAllData();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(
+                                      0xFFF44336), //Colors.greenAccent.shade400,
+                                  //kPrimaryColor,
+                                  elevation: 2,
+                                  side:
+                                      BorderSide(color: Colors.white, width: 1),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                  ),
+
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                                child: Text(
+                                  "RELOAD",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      letterSpacing: 2.2,
+                                      color: Colors.white),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          //else is internet connection is not available
-          else if (connection == false && loading == false)
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            "No Internet Connectivity",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Pacifico',
-                                fontWeight: FontWeight.w300,
-                                fontSize: 20),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Lottie.asset(
-                            'assets/norecordsfound.json',
-                            width: size.width * 0.80,
-                            height: size.height * 0.20,
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Text(
-                              "Please turn on your wifi or mobile data \n to view all plumbers",
+              );
+            //else is internet connection is not available
+            else if (connection == false && loading == false)
+              return Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Column(
+                          children: [
+                            Text(
+                              "No Internet Connectivity",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 18)),
-                          SizedBox(height: size.height * 0.05),
-                        ],
+                                  fontFamily: 'Pacifico',
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 20),
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            Lottie.asset(
+                              'assets/norecordsfound.json',
+                              width: size.width * 0.80,
+                              height: size.height * 0.20,
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            Text(
+                                "Please turn on your wifi or mobile data \n to view all plumbers",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 18)),
+                            SizedBox(height: size.height * 0.05),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          /*
+              );
+            /*
                     else if (dataList.isEmpty && loading == false)
                     return Text("No data foundsss");
                     */
-          else
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+            else
+              return Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                  ),
                 ),
-              ),
-            );
-        },
+              );
+          },
+        ),
       ),
-    ));
+      /*
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          controller.animateTo(controller.position.maxScrollExtent,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn);
+        },
+        child: Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle, // circular shape
+              gradient: LinearGradient(
+                colors: [
+                  kPrimaryColor,
+                  kPrimarySecondColor,
+                ],
+              ),
+            ),
+            child: Icon(Icons.arrow_upward, color: Color(0xFFFFFFFF))),
+      ),
+      */
+    );
   }
 
   //card list design

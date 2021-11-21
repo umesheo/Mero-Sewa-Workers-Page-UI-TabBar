@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:merosewa_app/Authentication/Auto%20Login/shared_pref_helper.dart';
 import 'package:merosewa_app/constants.dart';
@@ -150,7 +151,8 @@ class FeedbackState extends State<FeedBack> {
           appBar: AppBar(
             backgroundColor: Color(0xFFFFFFFF),
             elevation: 0.3,
-            title: Text("Feedback", style: TextStyle(color: kBlackColor)),
+            title: Text("Feedback",
+                style: GoogleFonts.varelaRound(color: kBlackColor)),
             leading: IconButton(
               icon: Icon(Icons.arrow_back,
                   color: Colors
@@ -319,9 +321,7 @@ class FeedbackState extends State<FeedBack> {
                       const BorderSide(color: kPrimarySecondColor, width: 1.0),
                 ),
                 hintText: placeHolder,
-                hintStyle: TextStyle(
-                  fontSize: 15,
-                )),
+                hintStyle: GoogleFonts.varelaRound()),
           )
         ],
       );

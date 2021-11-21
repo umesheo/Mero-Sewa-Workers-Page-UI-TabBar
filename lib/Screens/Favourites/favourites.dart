@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 //class to display user's favourite workers
 class Favourites extends StatefulWidget {
@@ -48,7 +49,8 @@ class _FavouritesState extends State<Favourites> {
           child: Container(
               child: Text(
             'Favourites',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            style: GoogleFonts.varelaRound(
+                fontSize: 20, fontWeight: FontWeight.bold),
           )),
         ),
       ),

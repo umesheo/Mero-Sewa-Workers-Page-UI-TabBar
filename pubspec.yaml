@@ -74,7 +74,10 @@ dependencies:
 
   location:
   lottie: ^1.2.1
+
+  #first letter of each word, small or capital case
   string_extension:
+  
 
 dev_dependencies:
   flutter_test:

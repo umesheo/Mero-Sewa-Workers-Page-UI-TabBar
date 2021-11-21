@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:merosewa_app/Authentication/Auto%20Login/api.dart';
 import 'package:merosewa_app/Authentication/Social%20Login/Google/google_sign_in.dart';
 import 'package:merosewa_app/Screens/Login/components/body.dart';
@@ -151,12 +152,10 @@ class _ChangePasswordState extends State<ChangePassword> {
                             color: kPrimarySecondColor, width: 1.0),
                       ),
                       labelText: 'New Password',
-                      floatingLabelStyle:
-                          (TextStyle(color: kPrimarySecondColor, fontSize: 20)),
+                      floatingLabelStyle: GoogleFonts.varelaRound(
+                          color: kPrimarySecondColor, fontSize: 20),
                       hintText: 'Enter New Password',
-                      labelStyle: TextStyle(
-                        fontSize: 15.0,
-                      ),
+                      labelStyle: GoogleFonts.varelaRound(),
                       errorStyle:
                           TextStyle(color: Colors.redAccent, fontSize: 15),
                     ),
@@ -185,10 +184,10 @@ class _ChangePasswordState extends State<ChangePassword> {
                             color: kPrimarySecondColor, width: 1.0),
                       ),
                       labelText: 'Confirm Password',
-                      floatingLabelStyle:
-                          (TextStyle(color: kPrimarySecondColor, fontSize: 20)),
+                      floatingLabelStyle: GoogleFonts.varelaRound(
+                          color: kPrimarySecondColor, fontSize: 20),
                       hintText: 'Enter New Password',
-                      labelStyle: TextStyle(fontSize: 15.0),
+                      labelStyle: GoogleFonts.varelaRound(),
                       errorStyle:
                           TextStyle(color: Colors.redAccent, fontSize: 15),
                     ),

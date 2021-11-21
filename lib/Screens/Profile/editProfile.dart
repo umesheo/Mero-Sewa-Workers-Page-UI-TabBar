@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:merosewa_app/Authentication/Auto%20Login/api.dart';
 import 'package:merosewa_app/Authentication/Social%20Login/Google/google_sign_in.dart';
 import 'package:merosewa_app/Screens/Login/components/body.dart';
@@ -325,7 +326,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
               children: [
                 Text(
                   "Edit Profile",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.varelaRound(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 SizedBox(
                   height: size.height * 0.03,
@@ -394,6 +398,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
                         controller: nameController,
+                        style: GoogleFonts.varelaRound(),
                         validator: (value) {
                           {
                             if (value == null || value.isEmpty) {
@@ -416,6 +421,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
                         controller: emailController,
+                        style: GoogleFonts.varelaRound(),
                         validator: (value) {
                           {
                             if (!value!.contains('@')) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:merosewa_app/Authentication/Auto%20Login/api.dart';
 import 'package:merosewa_app/Authentication/Auto%20Login/shared_pref_helper.dart';
 import 'package:merosewa_app/Authentication/Social%20Login/Google/google_sign_in.dart';
@@ -313,12 +314,19 @@ class ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: size.height * 0.02),
               //Displaying the user's name
-              Text('$name', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('$name',
+                  style: GoogleFonts.varelaRound(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  )),
               SizedBox(height: size.height * 0.01),
               //Displaying the user's email
               Text(
                 '$email',
-                style: TextStyle(fontWeight: FontWeight.w100),
+                style: GoogleFonts.varelaRound(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade600),
               ),
               SizedBox(height: size.height * 0.04),
               //Edit Profile
@@ -366,7 +374,12 @@ class ProfilePageState extends State<ProfilePage> {
                     children: [
                       Icon(Icons.person, color: kPrimarySecondColor),
                       SizedBox(width: 20),
-                      Expanded(child: Text("Edit Profile")),
+                      Expanded(
+                          child: Text("Edit Profile",
+                              style: GoogleFonts.varelaRound(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade800,
+                              ))),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: kPrimaryColor,
@@ -421,7 +434,12 @@ class ProfilePageState extends State<ProfilePage> {
                     children: [
                       Icon(Icons.password, color: kPrimarySecondColor),
                       SizedBox(width: 20),
-                      Expanded(child: Text("Change Password")),
+                      Expanded(
+                          child: Text("Change Password",
+                              style: GoogleFonts.varelaRound(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade800,
+                              ))),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: kPrimaryColor,
@@ -450,7 +468,12 @@ class ProfilePageState extends State<ProfilePage> {
                     children: [
                       Icon(Icons.help, color: kPrimarySecondColor),
                       SizedBox(width: 20),
-                      Expanded(child: Text("Help Center")),
+                      Expanded(
+                          child: Text("Help Center",
+                              style: GoogleFonts.varelaRound(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade800,
+                              ))),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: kPrimaryColor,
