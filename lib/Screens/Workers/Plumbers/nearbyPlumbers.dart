@@ -8,6 +8,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:merosewa_app/dbWordCapitalize.dart';
 
 //class to display plumber lists
 class NearbyPlumbersLists extends StatefulWidget {
@@ -38,6 +40,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
   late Geolocator geoLocator;
   bool permissionError = false;
   bool connection = false;
+
   //Location currentLocation =  Location();
   @override
   void initState() {
@@ -161,7 +164,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
       });
 
       //print(address);
-      await fetchData();
+      fetchData();
     } finally {
       setState(() {
         loading = false;
@@ -228,7 +231,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
     await referenceData
         .child("Workers")
         .orderByChild("NearbyLocation") //remove order by child
-        .equalTo(address) //and order by to display all workers
+        //and order by to display all workers
         .once()
         .then((DataSnapshot snapshot) {
       //clear the previous stored datalist
@@ -239,19 +242,27 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
       var values = snapshot.value;
 
       for (var key in keys) {
-        //if category is plumber
-        if (values[key]["Category"] == "Plumber") {
-          //fetch all data of the plumbers from database
-          //who are nearby the current location of the user
-          //and add to Data class constructor
-          Data data = new Data(
-              values[key]["Category"],
-              values[key]["Name"],
-              values[key]["Address"],
-              values[key]["PhoneNumber"],
-              values[key]["URL"]);
-          //then add the value to the data list
-          dataList.add(data);
+        //since firebase database is case sensitive
+        //and geocoder only returns data first word capital. For eg. Kusunti
+        //compare the database nearbylocation to address
+        //and return the data even if the location is saved on small case in database (kusunti)
+        if (values[key]["NearbyLocation"] == address ||
+            values[key]["NearbyLocation"] == smallFirst(address)) {
+          //if category is plumber
+          if (values[key]["Category"] == "Plumber" ||
+              values[key]["Category"] == "plumber") {
+            //fetch all data of the plumbers from database
+            //who are nearby the current location of the user
+            //and add to Data class constructor
+            Data data = new Data(
+                values[key]["Category"],
+                values[key]["Name"],
+                values[key]["Address"],
+                values[key]["PhoneNumber"],
+                values[key]["URL"]);
+            //then add the value to the data list
+            dataList.add(data);
+          }
         }
       }
       //print("Snapshot Value${snapshot.value}");
@@ -260,6 +271,54 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
 
     //return the data list
     return dataList;
+  }
+
+  //capitalize first word of each. For eg: hello world to Hello World
+  String capitalFirst(String location) {
+    if (location.length <= 1) {
+      return location.toUpperCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = location.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toUpperCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
+  }
+
+//capitalize first word of each. For eg: hello world to Hello World
+  String smallFirst(String location) {
+    if (location.length <= 1) {
+      return location.toLowerCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = location.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toLowerCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
   }
 
   @override
@@ -302,47 +361,49 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
               address != "" &&
               loading == false)
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  //if address is not empty
-                  //but no plumber was found nearby the location
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          "No plumbers found nearby",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Pacifico',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Lottie.asset(
-                          'assets/norecordsfound.json',
-                          width: size.width * 0.80,
-                          height: size.height * 0.20,
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Text(
-                            "We're sorry to inform you that \n  no plumbers were found nearby \n $address",
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //if address is not empty
+                    //but no plumber was found nearby the location
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "No plumbers found nearby",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontWeight: FontWeight.w300, fontSize: 18)),
-                        SizedBox(height: size.height * 0.05),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Text(
-                              "Please go to All Plumbers page to \n view the plumbers available in \n other locations ",
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Lottie.asset(
+                            'assets/norecordsfound.json',
+                            width: size.width * 0.80,
+                            height: size.height * 0.20,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text(
+                              "We're sorry to inform you that \n  no plumbers were found nearby \n $address",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 16)),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                                "Please go to All Plumbers page to \n view the plumbers available in \n other locations ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 16)),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           //else if internet connection is available
@@ -352,91 +413,15 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
 
             //display a message
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                      child: Column(
-                    children: [
-                      Text(
-                        "Your location might be turned off",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: 'Pacifico',
-                            fontWeight: FontWeight.w300,
-                            fontSize: 20),
-                      ),
-                      SizedBox(height: size.height * 0.03),
-                      Lottie.asset(
-                        'assets/location.json',
-                        width: size.width * 0.80,
-                        height: size.height * 0.20,
-                      ),
-
-                      SizedBox(height: size.height * 0.03),
-                      Text(
-                          "We require you to turn your device \n location on to view the plumbers nearby",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 18)),
-
-                      SizedBox(height: size.height * 0.05),
-                      //Display a try again button
-                      //until the user turns on the location
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await getInternetConnection();
-                            if (connection == true) {
-                              _determinePermissions();
-                              //get the current position of user
-                              getPosition();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Color(
-                                0xFFF44336), //Colors.greenAccent.shade400,
-                            //kPrimaryColor,
-                            elevation: 2,
-                            side: BorderSide(color: Colors.white, width: 1),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 30,
-                            ),
-
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: Text(
-                            "TRY AGAIN",
-                            style: TextStyle(
-                                fontSize: 14,
-                                letterSpacing: 2.2,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )),
-                ],
-              ),
-            );
-          //else if location is enabled
-          //and internet connection is also available
-          //but for some reason the address is returned empty
-          else if (connection == true &&
-              serviceEnabled &&
-              address == "" &&
-              loading == false)
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Column(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        child: Column(
                       children: [
                         Text(
-                          "Something went wrong",
+                          "Your location might be turned off",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: 'Pacifico',
@@ -444,26 +429,28 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                               fontSize: 20),
                         ),
                         SizedBox(height: size.height * 0.03),
-                        Image.asset(
-                          "assets/images/gmail.png",
-                          height: size.height * 0.15,
+                        Lottie.asset(
+                          'assets/location.json',
+                          width: size.width * 0.80,
+                          height: size.height * 0.20,
                         ),
+
                         SizedBox(height: size.height * 0.03),
                         Text(
-                            "Please check your Internet Connection \n and make sure to turn on the \n device location",
+                            "We require you to turn your device \n location on to view the plumbers nearby",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontWeight: FontWeight.w300, fontSize: 18)),
+
                         SizedBox(height: size.height * 0.05),
-                        //Display a reload button
+                        //Display a try again button
+                        //until the user turns on the location
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: ElevatedButton(
                             onPressed: () async {
                               await getInternetConnection();
-
                               if (connection == true) {
-                                //check the location permissions
                                 _determinePermissions();
                                 //get the current position of user
                                 getPosition();
@@ -483,7 +470,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                                   borderRadius: BorderRadius.circular(8)),
                             ),
                             child: Text(
-                              "RELOAD",
+                              "TRY AGAIN",
                               style: TextStyle(
                                   fontSize: 14,
                                   letterSpacing: 2.2,
@@ -492,9 +479,87 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                           ),
                         ),
                       ],
+                    )),
+                  ],
+                ),
+              ),
+            );
+          //else if location is enabled
+          //and internet connection is also available
+          //but for some reason the address is returned empty
+          else if (connection == true &&
+              serviceEnabled &&
+              address == "" &&
+              loading == false)
+            return Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "Something went wrong",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Image.asset(
+                            "assets/images/gmail.png",
+                            height: size.height * 0.15,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text(
+                              "Please check your Internet Connection \n and make sure to turn on the \n device location",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                          //Display a reload button
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await getInternetConnection();
+
+                                if (connection == true) {
+                                  //check the location permissions
+                                  _determinePermissions();
+                                  //get the current position of user
+                                  getPosition();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Color(
+                                    0xFFF44336), //Colors.greenAccent.shade400,
+                                //kPrimaryColor,
+                                elevation: 2,
+                                side: BorderSide(color: Colors.white, width: 1),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                ),
+
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: Text(
+                                "RELOAD",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    letterSpacing: 2.2,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ); /*
               else if (dataList.isEmpty && loading == false)
@@ -503,37 +568,39 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
           //else is internet connection is not available
           else if (connection == false && loading == false)
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          "No Internet Connectivity",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Pacifico',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Lottie.asset(
-                          'assets/norecordsfound.json',
-                          width: size.width * 0.80,
-                          height: size.height * 0.20,
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Text(
-                            "Please turn on your wifi or mobile data \n to view nearby plumbers",
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "No Internet Connectivity",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontWeight: FontWeight.w300, fontSize: 18)),
-                        SizedBox(height: size.height * 0.05),
-                      ],
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Lottie.asset(
+                            'assets/norecordsfound.json',
+                            width: size.width * 0.80,
+                            height: size.height * 0.20,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text(
+                              "Please turn on your wifi or mobile data \n to view nearby plumbers",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           else
@@ -581,10 +648,10 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          name!,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
+                          //display capital first letter of each word
+                          capitalFirst(name!),
+                          style: GoogleFonts.varelaRound(
+                            fontSize: 21,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -600,12 +667,13 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                             color: Colors.cyan,
                             size: 20,
                           ),
+                          SizedBox(width: 10),
                           Text(
-                            address!,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal),
+                            capitalFirst(address!),
+                            style: GoogleFonts.varelaRound(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ],
                       ),
@@ -617,12 +685,13 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                           color: Colors.cyan,
                           size: 20,
                         ),
+                        SizedBox(width: 10),
                         Text(
-                          category!,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
+                          capitalFirst(category!),
+                          style: GoogleFonts.varelaRound(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ],
                     ),

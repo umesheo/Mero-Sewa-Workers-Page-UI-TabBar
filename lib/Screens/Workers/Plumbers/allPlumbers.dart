@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
 import 'dart:io';
+import 'package:google_fonts/google_fonts.dart';
 
 //class to display plumber lists
 class AllPlumbersList extends StatefulWidget {
@@ -102,7 +103,8 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
 
       for (var key in keys) {
         //if category is plumber
-        if (values[key]["Category"] == "Plumber") {
+        if (values[key]["Category"] == "Plumber" ||
+            values[key]["Category"] == "plumber") {
           //fetch all data of the plumbers from database
 
           //and add to Data class constructor
@@ -121,6 +123,30 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
     });
     //return the data list
     return dataList;
+  }
+
+  //capitalize first word of each. For eg: hello world to Hello World
+  String capitalFirst(String location) {
+    if (location.length <= 1) {
+      return location.toUpperCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = location.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toUpperCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
   }
 
   @override
@@ -161,104 +187,108 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
           //but for some reason the address is returned empty
           else if (snapshot.hasError && connection == true && loading == false)
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          "Something went wrong",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Pacifico',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Image.asset(
-                          "assets/images/gmail.png",
-                          height: size.height * 0.15,
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Text("An unknown error has occured",
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "Something went wrong",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontWeight: FontWeight.w300, fontSize: 18)),
-                        SizedBox(height: size.height * 0.05),
-                        //Display a reload button
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await getInternetConnection();
-
-                              if (connection == true) {
-                                loadAllData();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Color(
-                                  0xFFF44336), //Colors.greenAccent.shade400,
-                              //kPrimaryColor,
-                              elevation: 2,
-                              side: BorderSide(color: Colors.white, width: 1),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 30,
-                              ),
-
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                            child: Text(
-                              "RELOAD",
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Image.asset(
+                            "assets/images/gmail.png",
+                            height: size.height * 0.15,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text("An unknown error has occured",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 14,
-                                  letterSpacing: 2.2,
-                                  color: Colors.white),
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                          //Display a reload button
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await getInternetConnection();
+
+                                if (connection == true) {
+                                  loadAllData();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Color(
+                                    0xFFF44336), //Colors.greenAccent.shade400,
+                                //kPrimaryColor,
+                                elevation: 2,
+                                side: BorderSide(color: Colors.white, width: 1),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                ),
+
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: Text(
+                                "RELOAD",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    letterSpacing: 2.2,
+                                    color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           //else is internet connection is not available
           else if (connection == false && loading == false)
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          "No Internet Connectivity",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Pacifico',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Lottie.asset(
-                          'assets/norecordsfound.json',
-                          width: size.width * 0.80,
-                          height: size.height * 0.20,
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Text(
-                            "Please turn on your wifi or mobile data \n to view all plumbers",
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            "No Internet Connectivity",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontWeight: FontWeight.w300, fontSize: 18)),
-                        SizedBox(height: size.height * 0.05),
-                      ],
+                                fontFamily: 'Pacifico',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Lottie.asset(
+                            'assets/norecordsfound.json',
+                            width: size.width * 0.80,
+                            height: size.height * 0.20,
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Text(
+                              "Please turn on your wifi or mobile data \n to view all plumbers",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 18)),
+                          SizedBox(height: size.height * 0.05),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           /*
@@ -310,10 +340,10 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          name!,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
+                          //display capital first letter of each word
+                          capitalFirst(name!),
+                          style: GoogleFonts.varelaRound(
+                            fontSize: 21,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -329,12 +359,13 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
                             color: Colors.cyan,
                             size: 20,
                           ),
+                          SizedBox(width: 10),
                           Text(
-                            address!,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal),
+                            capitalFirst(address!),
+                            style: GoogleFonts.varelaRound(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ],
                       ),
@@ -346,12 +377,13 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
                           color: Colors.cyan,
                           size: 20,
                         ),
+                        SizedBox(width: 10),
                         Text(
-                          category!,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
+                          capitalFirst(category!),
+                          style: GoogleFonts.varelaRound(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ],
                     ),

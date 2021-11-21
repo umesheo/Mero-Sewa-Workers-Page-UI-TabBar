@@ -190,7 +190,7 @@ class HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.only(top: 0, bottom: 20),
+                  margin: EdgeInsets.only(top: 0, bottom: 15),
                   //color: Colors.grey.shade300, //Color(0xffffffff),
                   child: Column(
                     children: [
@@ -381,278 +381,242 @@ class HomeScreenState extends State<HomeScreen> {
     Size size = MediaQuery.of(context).size;
     return Container(
       child: Padding(
-        //padding: const EdgeInsets.all(15.0),
-        padding: EdgeInsets.only(top: 0, bottom: 20, right: 15, left: 15),
-        child: Container(
-          //color: kPrimaryColor,
-          /*
-          decoration: BoxDecoration(
-            /*
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 1,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+        padding: EdgeInsets.only(top: 0, bottom: 0, right: 25, left: 25),
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              width: size.width * 2,
+              decoration: BoxDecoration(
+                color: Colors.cyan[300],
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
               ),
-            ],
-            */
-            color: kPrimaryColor,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-            ),
-          ),
-          */
-          //Color(0xffffffff), //Colors.grey.shade100,  //Color(0xffffffff),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 0,
-              //bottom: 20,
-              //right: 20,
-              //left: 20,
-              //right: 15,
-              //left: 15,
-              right: 10, left: 10,
-            ),
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    height: 100,
-                    width: 400,
-                    decoration: BoxDecoration(
-                      color: Colors.cyan[300],
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: Offset(0, 3), // changes position of shadow
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8.0,
-                        left: 15,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Column(
-                                  children: [
-                                    Text("Indroducing",
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 14)),
-                                    Text("Mero Sewa",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold)),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text("Find your workers easily now!",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                Lottie.asset(
-                                  'assets/searching.json',
-                                  width: 150,
-                                  height: 90,
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Hire Workers',
-                          style: GoogleFonts.varelaRound(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        /*
-                        //Explore all button
-                        _ExploreAllButton(
-                          onTap: () {},
-                        ),
-                        */
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 0),
-                      child: Column(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Column(
                             children: [
-                              //calling and assigning values to the WorkersTile constructor
-                              //main design of categories card: WorkersTile class
-                              GestureDetector(
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    assetPath: 'assets/images/Plumber.png',
-                                    color:
-                                        Color(0xffDFECF8), //Color(0xffffffff),
-                                    //price: 'Some Text',
-                                    title: 'Plumbers',
-                                  ),
-                                ),
-                                onTap: () async {
-                                  //check internet connection
-                                  await getInternetConnection();
-                                  //if internet connection is available
-                                  if (connection == true) {
-                                    Navigator.of(context)
-                                        .push(_createRoute(TabBarPage()));
-                                  }
-                                  //else if internet connection is not available
-                                  else if (connection == false) {
-                                    //display error
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          duration: const Duration(
-                                              milliseconds: 1500),
-                                          backgroundColor: Colors.redAccent,
-                                          content: Text(
-                                              "No Internet Connectivity",
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  color: Colors.white),
-                                              textAlign: TextAlign.center),
-                                          shape: StadiumBorder(),
-                                          behavior: SnackBarBehavior.floating,
-                                          elevation: 0,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 20),
-                                        ),
-                                      );
-                                  }
-                                },
-                              ),
-
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    color:
-                                        Color(0xffDFECF8), // Color(0xffffffff),
-                                    assetPath: 'assets/images/electrician.png',
-                                    title: 'Electricians',
-                                    //price: 'Some Text',
-                                  ),
+                              Text(
+                                "Indroducing",
+                                style: GoogleFonts.varelaRound(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    color:
-                                        Color(0xffDFECF8), //Color(0xffffffff),
-                                    assetPath: 'assets/images/mechanic.png',
-                                    title: 'Mechanics',
-                                  ),
+                              Text(
+                                "Mero Sewa",
+                                style: GoogleFonts.varelaRound(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Find your workers easily now!",
+                                style: GoogleFonts.varelaRound(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    color:
-                                        Color(0xffDFECF8), // Color(0xffffffff),
-                                    assetPath: 'assets/images/painter.png',
-                                    title: 'Painters',
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    color:
-                                        Color(0xffDFECF8), // Color(0xffffffff),
-                                    assetPath: 'assets/images/carpenter.png',
-                                    title: 'Carpenter',
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  height: 130,
-                                  //width: 160,
-                                  width: 105,
-                                  child: WorkersTile(
-                                    color:
-                                        Color(0xffDFECF8), //Color(0xffffffff),
-                                    assetPath: 'assets/images/cleaner.png',
-
-                                    title: 'Cleaners',
-                                  ),
-                                ),
-                              ),
-                            ],
+                          SizedBox(width: size.width * 0.04),
+                          Lottie.asset(
+                            'assets/searching.json',
+                            width: 90,
+                            height: 90,
                           ),
-                          SizedBox(height: 15),
                         ],
                       ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Hire Workers',
+                    style: GoogleFonts.varelaRound(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  //to display the workers card
-                  // _buildWorkersCardList()
+                  /*
+                  //Explore all button
+                  _ExploreAllButton(
+                    onTap: () {},
+                  ),
+                  */
                 ],
               ),
             ),
-          ),
+            SizedBox(
+              height: 10,
+            ),
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        //calling and assigning values to the WorkersTile constructor
+                        //main design of categories card: WorkersTile class
+                        GestureDetector(
+                          child: Container(
+                            height: 130,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              assetPath: 'assets/images/Plumber.png',
+                              color: Color(0xffDFECF8), //Color(0xffffffff),
+                              //price: 'Some Text',
+                              title: 'Plumbers',
+                            ),
+                          ),
+                          onTap: () async {
+                            //check internet connection
+                            await getInternetConnection();
+                            //if internet connection is available
+                            if (connection == true) {
+                              Navigator.of(context)
+                                  .push(_createRoute(TabBarPage()));
+                            }
+                            //else if internet connection is not available
+                            else if (connection == false) {
+                              //display error
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    duration:
+                                        const Duration(milliseconds: 1500),
+                                    backgroundColor: Colors.redAccent,
+                                    content: Text("No Internet Connectivity",
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Colors.white),
+                                        textAlign: TextAlign.center),
+                                    shape: StadiumBorder(),
+                                    behavior: SnackBarBehavior.floating,
+                                    elevation: 0,
+                                    padding: EdgeInsets.symmetric(vertical: 20),
+                                  ),
+                                );
+                            }
+                          },
+                        ),
+
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 130,
+
+                            //width: 105,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              color: Color(0xffDFECF8), // Color(0xffffffff),
+                              assetPath: 'assets/images/electrician.png',
+                              title: 'Electricians',
+                              //price: 'Some Text',
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 130,
+                            //width: 105,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              color: Color(0xffDFECF8), //Color(0xffffffff),
+                              assetPath: 'assets/images/mechanic.png',
+                              title: 'Mechanics',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 130,
+
+                            //width: 105,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              color: Color(0xffDFECF8), // Color(0xffffffff),
+                              assetPath: 'assets/images/painter.png',
+                              title: 'Painters',
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 130,
+
+                            //width: 105,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              color: Color(0xffDFECF8), // Color(0xffffffff),
+                              assetPath: 'assets/images/carpenter.png',
+                              title: 'Carpenter',
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 130,
+
+                            //width: 105,
+                            width: size.width * 0.27,
+                            child: WorkersTile(
+                              color: Color(0xffDFECF8), //Color(0xffffffff),
+                              assetPath: 'assets/images/cleaner.png',
+                              title: 'Cleaners',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            //to display the workers card
+            // _buildWorkersCardList()
+          ],
         ),
       ),
     );

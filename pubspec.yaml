@@ -72,10 +72,9 @@ dependencies:
 
   translator: ^0.1.7
 
- 
-
   location:
   lottie: ^1.2.1
+  string_extension:
 
 dev_dependencies:
   flutter_test:

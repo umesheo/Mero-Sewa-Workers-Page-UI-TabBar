@@ -64,43 +64,79 @@ class _ContactUsState extends State<ContactUs> {
                 style: TextStyle(
                     fontFamily: "Pacifico", color: Colors.black, fontSize: 25)),
           ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(right: size.width * 0.045),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          body: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    //facebook icon
-                    SignInButton.mini(
-                        buttonType: ButtonType.facebook,
-                        onPressed: () {
-                          /*
-                          //navigate to the respective page
-                          //opening website within app
-                          Navigator.of(context)
-                              .push(_createRoute(WebViewPage()));*/
-                          //launching troopers facebook page
-                          launch('fb://page/1828671380568191');
-                        }),
-                    //instagram icon
-                    SignInButton.mini(
-                        buttonType: ButtonType.instagram,
-                        onPressed: () {
-                          //launching troopers instagram page
-                          launch('https://www.instagram.com/troopersgroup/');
-                        }),
-                    SizedBox(width: 25),
-                    //whatsapp icon
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          //facebook icon
+                          SignInButton.mini(
+                              buttonType: ButtonType.facebook,
+                              onPressed: () {
+                                /*
+                                //navigate to the respective page
+                                //opening website within app
+                                Navigator.of(context)
+                                    .push(_createRoute(WebViewPage()));*/
+                                //launching troopers facebook page
+                                launch('fb://page/1828671380568191');
+                              }),
+                          //whatsapp icon
+                          Container(
+                            height: 42,
+                            child: Ink(
+                              decoration: ShapeDecoration(
+                                  color: Colors.green,
+                                  shape: CircleBorder(),
+                                  shadows: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.9),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ]),
+                              child: IconButton(
+                                splashRadius: 22,
+                                icon: FaIcon(
+                                  FontAwesomeIcons.whatsapp,
+                                  color: Color(0xFFFFFFFF),
+                                ),
+                                color: Colors.white,
+                                onPressed: () {
+                                  //launching troopers whatsapp with an pre-defined inquiry text
+                                  launch(
+                                      'whatsapp://send?phone=$phoneNumber&text=$inquiryText');
+                                  //launch('sms:$phoneNumber?body=$inquiryText');
+                                },
+                              ),
+                            ),
+                          ),
+                          //instagram icon
+                          SignInButton.mini(
+                              buttonType: ButtonType.instagram,
+                              onPressed: () {
+                                //launching troopers instagram page
+                                launch(
+                                    'https://www.instagram.com/troopersgroup/');
+                              }),
+                        ],
+                      ),
+                    ),
+                    OrDivider(),
+                    //phone icon
                     Container(
                       height: 42,
-                      width: 42,
                       child: Ink(
                         decoration: ShapeDecoration(
-                            color: Colors.green,
+                            color: Color(0xFF2196F3),
                             shape: CircleBorder(),
                             shadows: [
                               BoxShadow(
@@ -113,83 +149,50 @@ class _ContactUsState extends State<ContactUs> {
                         child: IconButton(
                           splashRadius: 22,
                           icon: FaIcon(
-                            FontAwesomeIcons.whatsapp,
+                            FontAwesomeIcons.phone,
                             color: Color(0xFFFFFFFF),
                           ),
                           color: Colors.white,
                           onPressed: () {
-                            //launching troopers whatsapp with an pre-defined inquiry text
-                            launch(
-                                'whatsapp://send?phone=$phoneNumber&text=$inquiryText');
-                            //launch('sms:$phoneNumber?body=$inquiryText');
+                            //lauching phone dial pad with troopers phone number
+                            launch('tel:$phoneNumber');
                           },
                         ),
                       ),
                     ),
+                    SizedBox(height: 40),
+                    //troopers IT Page link
+                    Column(
+                      children: [
+                        Text(
+                          'Version 1.0.0 \u00a9 Troopers Pvt. Ltd',
+                          style: GoogleFonts.varelaRound(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade600),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        TextButton(
+                          child: Text(
+                            'Developed by Troopers IT Team',
+                            style: GoogleFonts.varelaRound(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade600),
+                          ),
+                          onPressed: () {
+                            //launching Troopers It Page
+                            launch('http://www.troopersgroup.com/It.html');
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              OrDivider(),
-              //phone icon
-              Container(
-                height: 42,
-                width: 42,
-                child: Ink(
-                  decoration: ShapeDecoration(
-                      color: Color(0xFF2196F3),
-                      shape: CircleBorder(),
-                      shadows: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.9),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset: Offset(0, 2),
-                        ),
-                      ]),
-                  child: IconButton(
-                    splashRadius: 22,
-                    icon: FaIcon(
-                      FontAwesomeIcons.phone,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                    color: Colors.white,
-                    onPressed: () {
-                      //lauching phone dial pad with troopers phone number
-                      launch('tel:$phoneNumber');
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(height: 40),
-              //troopers IT Page link
-              Column(
-                children: [
-                  Text(
-                    'Version 1.0.0 \u00a9 Troopers Pvt. Ltd',
-                    style: GoogleFonts.varelaRound(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  TextButton(
-                    child: Text(
-                      'Developed by Troopers IT Team',
-                      style: GoogleFonts.varelaRound(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600),
-                    ),
-                    onPressed: () {
-                      //launching Troopers It Page
-                      launch('http://www.troopersgroup.com/It.html');
-                    },
-                  ),
-                ],
-              ),
-            ],
+            ),
           )),
     );
   }

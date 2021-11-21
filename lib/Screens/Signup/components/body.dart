@@ -74,6 +74,30 @@ class SignupState extends State<Signup> {
     }
   }
 
+  //capitalize first word of each. For eg: hello world to Hello World
+  String capitalFirst(String location) {
+    if (location.length <= 1) {
+      return location.toUpperCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = location.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toUpperCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
+  }
+
   //signing up the user
   registration() async {
     //if user is trying to log in
@@ -96,7 +120,7 @@ class SignupState extends State<Signup> {
             .collection("users")
             .doc(user!.uid)
             .set({
-          'name': fullNameController.text,
+          'name': capitalFirst(fullNameController.text),
           'email': emailController.text,
           'photoURL': user!.photoURL,
           'uid': user!.uid,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:merosewa_app/constants.dart';
 
 //class to display the plumber details
@@ -38,6 +39,30 @@ class _PlumberDetailsState extends State<PlumberDetails> {
   _PlumberDetailsState(
       this.category, this.name, this.address, this.phoneNumber, this.photoURL);
 
+  //capitalize first word of each. For eg: hello world to Hello World
+  String capitalFirst(String location) {
+    if (location.length <= 1) {
+      return location.toUpperCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = location.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toUpperCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
+  }
+
   unfocus() {
     currentFocus = FocusScope.of(context);
 
@@ -62,10 +87,34 @@ class _PlumberDetailsState extends State<PlumberDetails> {
               child: Container(
                   child: Column(
                 children: [
-                  Text("$category"),
-                  Text("$name"),
-                  Text("$address"),
-                  Text("$phoneNumber"),
+                  Text(
+                    capitalFirst(category),
+                    style: GoogleFonts.varelaRound(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    capitalFirst(name),
+                    style: GoogleFonts.varelaRound(
+                      fontSize: 23,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Text(
+                    capitalFirst(address),
+                    style: GoogleFonts.varelaRound(
+                      fontSize: 23,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Text(
+                    capitalFirst(phoneNumber),
+                    style: GoogleFonts.varelaRound(
+                      fontSize: 23,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
                   Text("$photoURL"),
                 ],
               )),
