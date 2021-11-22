@@ -14,12 +14,22 @@ class TabBarPage extends StatefulWidget {
 class _TabBarPageState extends State<TabBarPage>
     with SingleTickerProviderStateMixin {
   late TabController controller;
-  late ScrollController scrollController;
+  ScrollController scrollController = new ScrollController();
+  bool top = true;
+
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 2, vsync: this);
+
     scrollController = ScrollController(initialScrollOffset: 0.0);
+  }
+
+  void _scrollToTop() {
+    //_scrollController.jumpTo(_scrollController.position.maxScrollExtent, );
+    scrollController.animateTo(scrollController.position.minScrollExtent,
+        duration: Duration(milliseconds: 700),
+        curve: Curves.fastOutSlowIn); //Curves.fastLinearToSlowEaseIn);
   }
 
   @override
@@ -41,7 +51,7 @@ class _TabBarPageState extends State<TabBarPage>
               return <Widget>[
                 new SliverAppBar(
                   title: Padding(
-                    padding: const EdgeInsets.only(left: 15.0),
+                    padding: const EdgeInsets.only(left: 0),
                     child: Column(
                       children: [
                         Row(
@@ -72,40 +82,14 @@ class _TabBarPageState extends State<TabBarPage>
                       80, //height:100 to display back button when collapsed //height:80 to hide back button when collapsed
                   expandedHeight: 180,
                   */
-                  elevation: 0.3,
+                  elevation: 0.0,
                   //pinned: true,
-                  floating: true,
+                  //floating: true,
                   //snap: true,
                   forceElevated: innerBoxIsScrolled,
                 ),
               ];
             },
-            /*
-          child: AppBar(
-            backgroundColor: Color(0xFFFFFFFF),
-            elevation: 0.3,
-            //title: Text("Plumbers", style: TextStyle(color: kBlackColor)),
-            bottom: TabBar(
-              controller: controller,
-              //isScrollable: true,
-              padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-              labelColor: Colors.black,
-              indicator: BoxDecoration(
-                  gradient:
-                      LinearGradient(colors: [Colors.cyan, Colors.greenAccent]),
-                  borderRadius: BorderRadius.circular(40),
-                  color: Colors.redAccent),
-              unselectedLabelColor: Colors.grey,
-              tabs: [
-                Tab(text: "Nearby"),
-                Tab(
-                  text: "All",
-                )
-              ],
-            ),
-          ),
-          */
-
             body: Column(
               children: [
                 Container(
@@ -135,55 +119,10 @@ class _TabBarPageState extends State<TabBarPage>
                     ],
                   ),
                 ),
-                /*
-                Padding(
-                  padding: const EdgeInsets.only(top: 0, right: 0, left: 0),
-                  child: Container(
-                    height: 60,
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    width: size.width * 0.8,
-                    child: TextFormField(
-                      obscureText: true,
-                      autofocus: false,
-                      cursorColor: kPrimaryColor,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        icon: Icon(Icons.lock, color: kPrimarySecondColor),
-                        border: InputBorder.none,
-                        /*
-                                    //show password eye icon
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        Icons.visibility,
-                                      ),
-                                      color: kPrimaryColor,
-                                      onPressed: () {
-                                        debugPrint("Pressed");
-                                      },
-                                    ),
-                                    */
-                        errorStyle:
-                            TextStyle(color: Colors.redAccent, fontSize: 10),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please Enter Password';
-                        }
-                        return null;
-                      },
-                    ),
-                    decoration: BoxDecoration(
-                      color: kPrimaryLightColor,
-                      borderRadius: BorderRadius.circular(29),
-                      //border: Border.all(color: Colors.black, width: 1.5),
-                    ),
-                  ),
-                ),
-                */
                 Expanded(
                   child: TabBarView(
                     controller: controller,
+
                     //physics: NeverScrollableScrollPhysics(),
                     children: [NearbyPlumbersLists(), AllPlumbersList()],
                   ),
@@ -191,12 +130,24 @@ class _TabBarPageState extends State<TabBarPage>
               ],
             )),
       ),
-      /*
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.refresh, size: 32),
-        onPressed: () {},
+        onPressed: () {
+          _scrollToTop();
+        },
+        child: Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle, // circular shape
+              gradient: LinearGradient(
+                colors: [
+                  kPrimaryColor,
+                  kPrimarySecondColor,
+                ],
+              ),
+            ),
+            child: Icon(Icons.arrow_upward, color: Color(0xFFFFFFFF))),
       ),
-      */
     );
   }
 }

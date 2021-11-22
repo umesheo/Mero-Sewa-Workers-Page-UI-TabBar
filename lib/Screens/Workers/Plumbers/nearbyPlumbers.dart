@@ -9,7 +9,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:merosewa_app/dbWordCapitalize.dart';
 
 //class to display plumber lists
 class NearbyPlumbersLists extends StatefulWidget {
@@ -86,7 +85,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
         });
 
         //timer?.cancel();
-        print(connection);
+        //print(connection);
       }
     } on SocketException catch (_) {
       print('not connected');
@@ -94,7 +93,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
         connection = false;
       });
 
-      print(connection);
+      //print(connection);
     }
   }
 /*
@@ -131,19 +130,6 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
         });
       });
 
-      /*
-      //getting the current position of the user
-      //and setting it to currentPosition variable
-      //first check if permission is given then only display data
-      await _determinePermissions().then((Position position) {
-        setState(() {
-          currentPosition = position;
-          location =
-              "Lat: ${currentPosition!.latitude}, Long: ${currentPosition!.longitude}";
-        });
-      });
-      */
-
       //getting the address from latitude and longitude
       //by passing the latitude and longitude to the constructor of placemarkFromCoordinates(latitude, longitude)
       //and storing to placemark variable
@@ -171,8 +157,8 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
       });
     }
 
-    print(
-        "Position: ---------------Longitude:${currentPosition!.longitude} && Latitude: ${currentPosition!.latitude}");
+    //print(
+    //  "Position: ---------------Longitude:${currentPosition!.longitude} && Latitude: ${currentPosition!.latitude}");
   }
 
   /// Determine whether the location services and permissions are enabled

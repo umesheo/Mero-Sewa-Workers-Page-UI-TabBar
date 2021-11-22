@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:merosewa_app/Screens/Workers/Plumbers/plumberDetails.dart';
+import 'package:merosewa_app/Screens/Workers/Plumbers/tabBar.dart';
 import 'package:merosewa_app/Screens/Workers/data.dart';
 import 'package:merosewa_app/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -23,16 +24,17 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
   String address = "";
   List<Data> dataList = [];
   bool connection = false;
-  final controller = ScrollController();
-  FixedExtentScrollController fixedExtentScrollController =
-      new FixedExtentScrollController();
+  ScrollController _scrollController = new ScrollController();
+  bool _firstAutoscrollExecuted = false;
+  bool _shouldAutoscroll = false;
 
   @override
   void initState() {
-    loadAllData();
-
     //fetchData();
     super.initState();
+
+    //_scrollController = ScrollController(initialScrollOffset: 0.0);
+    loadAllData();
   }
 
   //Creating route to smoothly navigate to pages
@@ -64,7 +66,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
         });
 
         //timer?.cancel();
-        print(connection);
+        //print(connection);
       }
     } on SocketException catch (_) {
       print('not connected');
@@ -72,7 +74,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
         connection = false;
       });
 
-      print(connection);
+      //print(connection);
     }
   }
 
@@ -96,7 +98,11 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
 
     //getting the data from database were address is
     //equals to users current location
-    await referenceData.child("Workers").once().then((DataSnapshot snapshot) {
+    await referenceData
+        .child("Workers")
+        .orderByChild("NearbyLocation")
+        .once()
+        .then((DataSnapshot snapshot) {
       //clear the previous stored datalist
       dataList.clear();
 
@@ -128,7 +134,8 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
     return dataList;
   }
 
-  //capitalize first word of each. For eg: hello world to Hello World
+  //capitalize first letter of each word.
+  //For eg: hello world to Hello World
   String capitalFirst(String location) {
     if (location.length <= 1) {
       return location.toUpperCase();
@@ -152,10 +159,15 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
     return capitalizedWords.join(' ');
   }
 
-  void scrollUp() {
-    final double start = 0;
-    controller.jumpTo(start);
+  
+
+  @override
+  void dispose() {
+    //_scrollController.removeListener(_scrollListener);
+    super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -169,10 +181,11 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData && loading == false)
               return ListView.builder(
-                  //controller: controller,
+                  //controller: _scrollController,
                   physics: BouncingScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: dataList.length,
+                  //reverse: true,
                   itemBuilder: (_, index) {
                     return GestureDetector(
                         onTap: () {
@@ -322,28 +335,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
           },
         ),
       ),
-      /*
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.animateTo(controller.position.maxScrollExtent,
-              duration: Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn);
-        },
-        child: Container(
-            height: 60,
-            width: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle, // circular shape
-              gradient: LinearGradient(
-                colors: [
-                  kPrimaryColor,
-                  kPrimarySecondColor,
-                ],
-              ),
-            ),
-            child: Icon(Icons.arrow_upward, color: Color(0xFFFFFFFF))),
-      ),
-      */
+     
     );
   }
 
