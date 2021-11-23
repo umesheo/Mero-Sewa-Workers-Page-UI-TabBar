@@ -221,9 +221,9 @@ class FeedbackState extends State<FeedBack> {
                                   subject: 'User Feedback',
                                   message: message);
 
-                              print("ayo hai yo$username");
-                              print("ayo hai yo$emails");
-                              print(subject);
+                              //print("ayo hai yo$username");
+                              //print("ayo hai yo$emails");
+                              //print(subject);
                             }
                             print(connection);
                           }

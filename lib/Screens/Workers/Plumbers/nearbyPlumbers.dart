@@ -39,6 +39,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
   late Geolocator geoLocator;
   bool permissionError = false;
   bool connection = false;
+  bool _searchFolded = true;
 
   //Location currentLocation =  Location();
   @override
@@ -307,300 +308,420 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
     return capitalizedWords.join(' ');
   }
 
+  var currentFocus;
+
+  unfocus() {
+    currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+      setState(() {
+        _searchFolded = true;
+      });
+    }
+  }
+
+  FocusNode focusNode = new FocusNode();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
+    return GestureDetector(
+      onTap: () {
+        unfocus();
+      },
+      child: Scaffold(
         body: Container(
-      child: FutureBuilder(
-        future: fetchData(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData && loading == false)
-            return ListView.builder(
-                physics: BouncingScrollPhysics(),
-                itemCount: dataList.length,
-                itemBuilder: (_, index) {
-                  return GestureDetector(
-                      onTap: () {
-                        //navigate to Plumber Details page with the all data
-                        Navigator.of(context).push(_createRoute(PlumberDetails(
-                            category: dataList[index].databaseCategory!,
-                            name: dataList[index].databaseName!,
-                            address: dataList[index].databaseAddress!,
-                            phoneNumber: dataList[index].phoneNumber!,
-                            photoURL: dataList[index].photoURL!)));
-                      },
-                      //displaying the data in card lists
-                      //include the details required in the lisitng page
-                      child: cardUI(
-                          dataList[index].databaseName,
-                          dataList[index].databaseAddress,
-                          dataList[index].databaseCategory,
-                          dataList[index].phoneNumber,
-                          dataList[index].photoURL));
-                });
-          //else is internet connection is available
-          //address is not empty and loading is false
-          //but nearby workers are not found
-          else if (connection == true &&
-              snapshot.hasError &&
-              address != "" &&
-              loading == false)
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //if address is not empty
-                    //but no plumber was found nearby the location
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            "No plumbers found nearby",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Pacifico',
-                                fontWeight: FontWeight.w300,
-                                fontSize: 20),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Lottie.asset(
-                            'assets/norecordsfound.json',
-                            width: size.width * 0.80,
-                            height: size.height * 0.20,
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Text(
-                              "We're sorry to inform you that \n  no plumbers were found nearby \n $address",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 18)),
-                          SizedBox(height: size.height * 0.05),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Text(
-                                "Please go to All Plumbers page to \n view the plumbers available in \n other locations ",
+          child: FutureBuilder(
+            future: fetchData(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData && loading == false)
+                return ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: dataList.length,
+                    itemBuilder: (_, index) {
+                      return GestureDetector(
+                          onTap: () {
+                            unfocus();
+                            //navigate to Plumber Details page with the all data
+                            Navigator.of(context).push(_createRoute(
+                                PlumberDetails(
+                                    category: dataList[index].databaseCategory!,
+                                    name: dataList[index].databaseName!,
+                                    address: dataList[index].databaseAddress!,
+                                    phoneNumber: dataList[index].phoneNumber!,
+                                    photoURL: dataList[index].photoURL!)));
+                          },
+                          //displaying the data in card lists
+                          //include the details required in the lisitng page
+                          child: cardUI(
+                              dataList[index].databaseName,
+                              dataList[index].databaseAddress,
+                              dataList[index].databaseCategory,
+                              dataList[index].phoneNumber,
+                              dataList[index].photoURL));
+                    });
+              //else is internet connection is available
+              //address is not empty and loading is false
+              //but nearby workers are not found
+              else if (connection == true &&
+                  snapshot.hasError &&
+                  address != "" &&
+                  loading == false)
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //if address is not empty
+                        //but no plumber was found nearby the location
+                        Container(
+                          child: Column(
+                            children: [
+                              Text(
+                                "No plumbers found nearby",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w300, fontSize: 16)),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            );
-          //else if internet connection is available
-          //but location is disabled and loading is false
-          //display location turned off
-          else if (connection == true && !serviceEnabled && loading == false)
-
-            //display a message
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                        child: Column(
-                      children: [
-                        Text(
-                          "Your location might be turned off",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Pacifico',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Lottie.asset(
-                          'assets/location.json',
-                          width: size.width * 0.80,
-                          height: size.height * 0.20,
-                        ),
-
-                        SizedBox(height: size.height * 0.03),
-                        Text(
-                            "We require you to turn your device \n location on to view the plumbers nearby",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w300, fontSize: 18)),
-
-                        SizedBox(height: size.height * 0.05),
-                        //Display a try again button
-                        //until the user turns on the location
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await getInternetConnection();
-                              if (connection == true) {
-                                _determinePermissions();
-                                //get the current position of user
-                                getPosition();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Color(
-                                  0xFFF44336), //Colors.greenAccent.shade400,
-                              //kPrimaryColor,
-                              elevation: 2,
-                              side: BorderSide(color: Colors.white, width: 1),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 30,
+                                    fontFamily: 'Pacifico',
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 20),
                               ),
+                              SizedBox(height: size.height * 0.03),
+                              Lottie.asset(
+                                'assets/norecordsfound.json',
+                                width: size.width * 0.80,
+                                height: size.height * 0.20,
+                              ),
+                              SizedBox(height: size.height * 0.03),
+                              Text(
+                                  "We're sorry to inform you that \n  no plumbers were found nearby \n $address",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 18)),
+                              SizedBox(height: size.height * 0.05),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Text(
+                                    "Please go to All Plumbers page to \n view the plumbers available in \n other locations ",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: 16)),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              //else if internet connection is available
+              //but location is disabled and loading is false
+              //display location turned off
+              else if (connection == true &&
+                  !serviceEnabled &&
+                  loading == false)
 
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                            child: Text(
-                              "TRY AGAIN",
+                //display a message
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            child: Column(
+                          children: [
+                            Text(
+                              "Your location might be turned off",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 14,
-                                  letterSpacing: 2.2,
-                                  color: Colors.white),
+                                  fontFamily: 'Pacifico',
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 20),
                             ),
+                            SizedBox(height: size.height * 0.03),
+                            Lottie.asset(
+                              'assets/location.json',
+                              width: size.width * 0.80,
+                              height: size.height * 0.20,
+                            ),
+
+                            SizedBox(height: size.height * 0.03),
+                            Text(
+                                "We require you to turn your device \n location on to view the plumbers nearby",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 18)),
+
+                            SizedBox(height: size.height * 0.05),
+                            //Display a try again button
+                            //until the user turns on the location
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await getInternetConnection();
+                                  if (connection == true) {
+                                    _determinePermissions();
+                                    //get the current position of user
+                                    getPosition();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(
+                                      0xFFF44336), //Colors.greenAccent.shade400,
+                                  //kPrimaryColor,
+                                  elevation: 2,
+                                  side:
+                                      BorderSide(color: Colors.white, width: 1),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                  ),
+
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                                child: Text(
+                                  "TRY AGAIN",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      letterSpacing: 2.2,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                      ],
+                    ),
+                  ),
+                );
+              //else if location is enabled
+              //and internet connection is also available
+              //but for some reason the address is returned empty
+              else if (connection == true &&
+                  serviceEnabled &&
+                  address == "" &&
+                  loading == false)
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Text(
+                                "Something went wrong",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontFamily: 'Pacifico',
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 20),
+                              ),
+                              SizedBox(height: size.height * 0.03),
+                              Image.asset(
+                                "assets/images/gmail.png",
+                                height: size.height * 0.15,
+                              ),
+                              SizedBox(height: size.height * 0.03),
+                              Text("Could not fetch the current location",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 18)),
+                              Text(
+                                  "Please check your Internet Connection \n and make sure to turn on the \n device location",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 18)),
+                              Text(
+                                  "Or please ensure that you have a strong \n wifi network access",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16)),
+                              SizedBox(height: size.height * 0.05),
+                              //Display a reload button
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await getInternetConnection();
+
+                                    if (connection == true) {
+                                      //check the location permissions
+                                      _determinePermissions();
+                                      //get the current position of user
+                                      getPosition();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(
+                                        0xFFF44336), //Colors.greenAccent.shade400,
+                                    //kPrimaryColor,
+                                    elevation: 2,
+                                    side: BorderSide(
+                                        color: Colors.white, width: 1),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 30,
+                                    ),
+
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                  ),
+                                  child: Text(
+                                    "RELOAD",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        letterSpacing: 2.2,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    )),
-                  ],
-                ),
-              ),
-            );
-          //else if location is enabled
-          //and internet connection is also available
-          //but for some reason the address is returned empty
-          else if (connection == true &&
-              serviceEnabled &&
-              address == "" &&
-              loading == false)
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            "Something went wrong",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Pacifico',
-                                fontWeight: FontWeight.w300,
-                                fontSize: 20),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Image.asset(
-                            "assets/images/gmail.png",
-                            height: size.height * 0.15,
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Text(
-                              "Please check your Internet Connection \n and make sure to turn on the \n device location",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 18)),
-                          SizedBox(height: size.height * 0.05),
-                          //Display a reload button
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await getInternetConnection();
-
-                                if (connection == true) {
-                                  //check the location permissions
-                                  _determinePermissions();
-                                  //get the current position of user
-                                  getPosition();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Color(
-                                    0xFFF44336), //Colors.greenAccent.shade400,
-                                //kPrimaryColor,
-                                elevation: 2,
-                                side: BorderSide(color: Colors.white, width: 1),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                ),
-
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: Text(
-                                "RELOAD",
+                    ),
+                  ),
+                );
+              //else is internet connection is not available
+              else if (connection == false && loading == false)
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Text(
+                                "No Internet Connectivity",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    letterSpacing: 2.2,
-                                    color: Colors.white),
+                                    fontFamily: 'Pacifico',
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 20),
                               ),
+                              SizedBox(height: size.height * 0.03),
+                              Lottie.asset(
+                                'assets/norecordsfound.json',
+                                width: size.width * 0.80,
+                                height: size.height * 0.20,
+                              ),
+                              SizedBox(height: size.height * 0.03),
+                              Text(
+                                  "Please turn on your wifi or mobile data \n to view nearby plumbers",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 18)),
+                              SizedBox(height: size.height * 0.05),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              else
+                return Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                    ),
+                  ),
+                );
+            },
+          ),
+        ),
+        //setting the search button position
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        //creating an animated search button
+        floatingActionButton: AnimatedContainer(
+          duration: Duration(milliseconds: 250),
+          height: 60,
+          //setting the width of the search button
+          width: _searchFolded ? 56 : size.width * 0.55,
+          decoration: _searchFolded
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: kElevationToShadow[6],
+                  // circular shape
+                  gradient: LinearGradient(
+                    colors: [
+                      kPrimaryColor,
+                      kPrimarySecondColor,
+                    ],
+                  ))
+              : BoxDecoration(
+                  boxShadow: kElevationToShadow[6],
+                  borderRadius: BorderRadius.circular(32),
+                  color: Colors.white),
+
+          child: Row(
+            children: [
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(
+                    0), //const EdgeInsets.only(left: 16.0, top: 8, bottom: 8),
+                child: Container(
+                    //color: Colors.transparent,
+                    padding: EdgeInsets.only(left: 20),
+                    child: !_searchFolded
+                        ? TextField(
+                            style: GoogleFonts.varelaRound(
+                                color: kPrimarySecondColor),
+                            textCapitalization: TextCapitalization.words,
+                            decoration: InputDecoration(
+                              hintText: 'Search',
+                              hintStyle: GoogleFonts.varelaRound(
+                                  color: kPrimarySecondColor),
+                              border: InputBorder.none,
                             ),
-                          ),
-                        ],
+                          )
+                        : null),
+              )),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 400),
+                child: Material(
+                  //hiding the auto grey splash
+                  type: MaterialType.transparency,
+                  child: InkWell(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(_searchFolded ? 32 : 0),
+                        topRight: Radius.circular(32),
+                        bottomLeft: Radius.circular(_searchFolded ? 32 : 0),
+                        bottomRight: Radius.circular(32),
                       ),
-                    ),
-                  ],
+                      child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: _searchFolded
+                              ? Icon(
+                                  Icons.search,
+                                  color: Color(0xFFFFFFFF),
+                                )
+                              : Icon(
+                                  Icons.close,
+                                  color: kBlackColor,
+                                )),
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(focusNode);
+                        setState(() {
+                          _searchFolded = !_searchFolded;
+                        });
+                      }),
                 ),
               ),
-            ); /*
-              else if (dataList.isEmpty && loading == false)
-              return Text("No data foundsss");
-              */
-          //else is internet connection is not available
-          else if (connection == false && loading == false)
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            "No Internet Connectivity",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Pacifico',
-                                fontWeight: FontWeight.w300,
-                                fontSize: 20),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Lottie.asset(
-                            'assets/norecordsfound.json',
-                            width: size.width * 0.80,
-                            height: size.height * 0.20,
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Text(
-                              "Please turn on your wifi or mobile data \n to view nearby plumbers",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 18)),
-                          SizedBox(height: size.height * 0.05),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          else
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                ),
-              ),
-            );
-        },
+            ],
+          ),
+        ),
       ),
-    ));
+    );
   }
 
   //card list design

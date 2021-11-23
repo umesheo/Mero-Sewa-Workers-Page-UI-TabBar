@@ -130,6 +130,7 @@ class _TabBarPageState extends State<TabBarPage>
               ],
             )),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _scrollToTop();
@@ -138,7 +139,9 @@ class _TabBarPageState extends State<TabBarPage>
             height: 60,
             width: 60,
             decoration: BoxDecoration(
-              shape: BoxShape.circle, // circular shape
+              // circular shape
+              shape: BoxShape.circle,
+
               gradient: LinearGradient(
                 colors: [
                   kPrimaryColor,
