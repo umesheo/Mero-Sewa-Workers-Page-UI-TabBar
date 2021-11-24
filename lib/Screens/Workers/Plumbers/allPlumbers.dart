@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:merosewa_app/Screens/Workers/Plumbers/plumberDetails.dart';
-import 'package:merosewa_app/Screens/Workers/Plumbers/tabBar.dart';
+
 import 'package:merosewa_app/Screens/Workers/data.dart';
 import 'package:merosewa_app/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -24,11 +25,17 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
   String address = "";
   List<Data> dataList = [];
   bool connection = false;
+  //search text field folded
   bool _searchFolded = true;
+  //search field is empty
+  bool searching = false;
+  //assign search textfield value
+  var searchText = "";
 
   @override
   void initState() {
-    //fetchData();
+    //instantly close the keyboard once the page is loaded
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.initState();
 
     //_scrollController = ScrollController(initialScrollOffset: 0.0);
@@ -90,57 +97,98 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
   }
 
   Future fetchAllData() async {
-    getInternetConnection();
-    //creating a database reference
-    DatabaseReference referenceData = FirebaseDatabase.instance.reference();
+    //if the user is not searching
+    //return all plumbers data
+    if (searching == false) {
+      getInternetConnection();
+      //creating a database reference
+      DatabaseReference referenceData = FirebaseDatabase.instance.reference();
 
-    //getting the data from database were address is
-    //equals to users current location
-    await referenceData
-        .child("Workers")
-        .orderByChild("NearbyLocation")
-        .once()
-        .then((DataSnapshot snapshot) {
-      //clear the previous stored datalist
-      dataList.clear();
+      //getting the data from database were address is
+      //equals to users current location
+      await referenceData
+          .child("Workers")
+          .orderByChild("NearbyLocation")
+          .once()
+          .then((DataSnapshot snapshot) {
+        //clear the previous stored datalist
+        dataList.clear();
 
-      //getting the keys (index) and values from snapshot
-      var keys = snapshot.value.keys;
-      var values = snapshot.value;
+        //getting the keys (index) and values from snapshot
+        var keys = snapshot.value.keys;
+        var values = snapshot.value;
 
-      for (var key in keys) {
-        //if category is plumber
-        if (values[key]["Category"] == "Plumber" ||
-            values[key]["Category"] == "plumber") {
-          //fetch all data of the plumbers from database
+        for (var key in keys) {
+          //if category is plumber
+          if (values[key]["Category"] == "Plumber" ||
+              values[key]["Category"] == "plumber") {
+            //fetch all data of the plumbers from database
 
-          //and add to Data class constructor
-          Data data = new Data(
-              values[key]["Category"],
-              values[key]["Name"],
-              values[key]["Address"],
-              values[key]["PhoneNumber"],
-              values[key]["URL"]);
-          //then add the value to the data list
-          dataList.add(data);
+            //and add to Data class constructor
+            Data data = new Data(
+                values[key]["Category"],
+                values[key]["Name"],
+                values[key]["Address"],
+                values[key]["PhoneNumber"],
+                values[key]["URL"]);
+            //then add the value to the data list
+            dataList.add(data);
+          }
         }
-      }
-      //print("Snapshot Value${snapshot.value}");
-      print(dataList[0].databaseAddress);
-    });
-    //return the data list
-    return dataList;
+        //print("Snapshot Value${snapshot.value}");
+        print(dataList[0].databaseAddress);
+      });
+      //return the data list
+      return dataList;
+    }
+    //else if the user is searching
+    //only return the searched data
+    else if (searching == true) {
+      DatabaseReference searchRef =
+          FirebaseDatabase.instance.reference().child("Workers");
+      searchRef.once().then((DataSnapshot snapShot) {
+        dataList.clear();
+        var keys = snapShot.value.keys;
+        var values = snapShot.value;
+
+        for (var key in keys) {
+          //if category is plumber
+          if (values[key]["Category"] == "Plumber" ||
+              values[key]["Category"] == "plumber") {
+            Data data = new Data(
+                capitalFirst(values[key]["Category"]),
+                capitalFirst(values[key]["Name"]),
+                capitalFirst(values[key]["Address"]),
+                capitalFirst(values[key]["PhoneNumber"]),
+                values[key]["URL"]);
+            //since the values are exactly compared and is case sensitive
+            //so if the the first letter of databaseAddress is capital and the first letter of search textfield is also capital the condition becomes true
+            //and if the first letter of search text field is in small then convert the first letter to capital case, now the condition becomes true
+            if (data.databaseAddress!.contains(searchText) ||
+                data.databaseAddress!.contains(capitalFirst(searchText)) ||
+                data.databaseName!.contains(searchText) ||
+                data.databaseName!.contains(capitalFirst(searchText))) {
+              dataList.add(data);
+            }
+          }
+          Timer(Duration(seconds: 1), () {
+            setState(() {});
+          });
+        }
+      });
+      return dataList;
+    }
   }
 
   //capitalize first letter of each word.
   //For eg: hello world to Hello World
-  String capitalFirst(String location) {
-    if (location.length <= 1) {
-      return location.toUpperCase();
+  String capitalFirst(String text) {
+    if (text.length <= 1) {
+      return text.toUpperCase();
     }
 
     // Split string into multiple words
-    final List<String> words = location.split(' ');
+    final List<String> words = text.split(' ');
 
     // Capitalize first letter of each words
     final capitalizedWords = words.map((word) {
@@ -157,11 +205,38 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
     return capitalizedWords.join(' ');
   }
 
+  //lower case the first word of each. For eg: Hello World to hello world
+  String smallFirst(String text) {
+    if (text.length <= 1) {
+      return text.toLowerCase();
+    }
+
+    // Split string into multiple words
+    final List<String> words = text.split(' ');
+
+    // Capitalize first letter of each words
+    final capitalizedWords = words.map((word) {
+      if (word.trim().isNotEmpty) {
+        final String firstLetter = word.trim().substring(0, 1).toLowerCase();
+        final String remainingLetters = word.trim().substring(1);
+
+        return '$firstLetter$remainingLetters';
+      }
+      return '';
+    });
+
+    // Join/Merge all words back to one String
+    return capitalizedWords.join(' ');
+  }
+
   var currentFocus;
 
   unfocus() {
     currentFocus = FocusScope.of(context);
-
+    //once the search field
+    setState(() {
+      searchText = "";
+    });
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
       setState(() {
@@ -264,6 +339,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
 
                                     if (connection == true) {
                                       loadAllData();
+                                      fetchAllData();
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -358,7 +434,7 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
           duration: Duration(milliseconds: 250),
           height: 60,
           //setting the width of the search button
-          width: _searchFolded ? 56 : size.width * 0.55,
+          width: _searchFolded ? 56 : size.width * 0.80,
           decoration: _searchFolded
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(32),
@@ -390,11 +466,32 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
                                 color: kPrimarySecondColor),
                             textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
-                              hintText: 'Search',
+                              hintText: 'Search for Name or Location',
                               hintStyle: GoogleFonts.varelaRound(
                                   color: kPrimarySecondColor),
                               border: InputBorder.none,
                             ),
+                            //checking for textfield changes
+                            onChanged: (text) {
+                              //if search textfield text is not empty
+                              if (text != "") {
+                                //set searching equals to true
+                                //and set the textfield text to seachText variable
+                                setState(() {
+                                  searching = true;
+                                  searchText = text;
+                                });
+                              }
+                              //else if search text field is empty
+                              else {
+                                //set searching equals to false
+
+                                setState(() {
+                                  searching = false;
+                                });
+                              }
+                              //print("------searching-------$searching");
+                            },
                           )
                         : null),
               )),
@@ -421,11 +518,42 @@ class _AllPlumbersListState extends State<AllPlumbersList> {
                                   Icons.close,
                                   color: kBlackColor,
                                 )),
-                      onTap: () {
+                      //search button on tap
+                      onTap: () async {
                         FocusScope.of(context).requestFocus(focusNode);
-                        setState(() {
-                          _searchFolded = !_searchFolded;
-                        });
+                        await getInternetConnection();
+                        if (connection == true) {
+                          setState(() {
+                            _searchFolded = !_searchFolded;
+                          });
+                          //if the user closes the search text field
+                          //se the searchText to empty
+                          //so that all of the data can be displayed again
+                          if (_searchFolded) {
+                            setState(() {
+                              searchText = "";
+                            });
+                          }
+                        } else {
+                          print("No internet");
+                          //display error
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                duration: const Duration(milliseconds: 1500),
+                                backgroundColor: Colors.redAccent,
+                                content: Text("No Internet Connectivity",
+                                    style: TextStyle(
+                                        fontSize: 16.0, color: Colors.white),
+                                    textAlign: TextAlign.center),
+                                shape: StadiumBorder(),
+                                behavior: SnackBarBehavior.floating,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                              ),
+                            );
+                        }
                       }),
                 ),
               ),

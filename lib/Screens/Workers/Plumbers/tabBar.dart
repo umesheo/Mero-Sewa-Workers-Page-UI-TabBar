@@ -8,14 +8,13 @@ class TabBarPage extends StatefulWidget {
   const TabBarPage({Key? key}) : super(key: key);
 
   @override
-  _TabBarPageState createState() => _TabBarPageState();
+  TabBarPageState createState() => TabBarPageState();
 }
 
-class _TabBarPageState extends State<TabBarPage>
+class TabBarPageState extends State<TabBarPage>
     with SingleTickerProviderStateMixin {
   late TabController controller;
   ScrollController scrollController = new ScrollController();
-  bool top = true;
 
   @override
   void initState() {
@@ -25,11 +24,10 @@ class _TabBarPageState extends State<TabBarPage>
     scrollController = ScrollController(initialScrollOffset: 0.0);
   }
 
-  void _scrollToTop() {
-    //_scrollController.jumpTo(_scrollController.position.maxScrollExtent, );
+  void scrollToTop() {
     scrollController.animateTo(scrollController.position.minScrollExtent,
         duration: Duration(milliseconds: 700),
-        curve: Curves.fastOutSlowIn); //Curves.fastLinearToSlowEaseIn);
+        curve: Curves.fastLinearToSlowEaseIn); //Curves.fastOutSlowIn);
   }
 
   @override
@@ -77,11 +75,7 @@ class _TabBarPageState extends State<TabBarPage>
                   backgroundColor: Color(0xFFFFFFFF),
 
                   toolbarHeight: 100,
-                  /*
-                  collapsedHeight:
-                      80, //height:100 to display back button when collapsed //height:80 to hide back button when collapsed
-                  expandedHeight: 180,
-                  */
+
                   elevation: 0.0,
                   //pinned: true,
                   //floating: true,
@@ -133,7 +127,7 @@ class _TabBarPageState extends State<TabBarPage>
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _scrollToTop();
+          scrollToTop();
         },
         child: Container(
             height: 60,

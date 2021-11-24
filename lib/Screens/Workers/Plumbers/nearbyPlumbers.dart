@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:merosewa_app/Screens/Workers/Plumbers/plumberDetails.dart';
 import 'package:merosewa_app/Screens/Workers/data.dart';
@@ -39,11 +40,18 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
   late Geolocator geoLocator;
   bool permissionError = false;
   bool connection = false;
+  //search text field folded
   bool _searchFolded = true;
+  //search field is empty
+  bool searching = false;
+  //assign search textfield value
+  var searchText = "";
 
   //Location currentLocation =  Location();
   @override
   void initState() {
+    //instantly close the keyboard once the page is loaded
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     asyncMethods();
 
     //fetchData();
@@ -207,67 +215,116 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
   //fetching workers from users current location
   //and according to the category
   Future fetchData() async {
-    getInternetConnection();
-    //await getInternetConnection();
+    //if the user is not searching
+    //return nearby plumbers data
+    if (searching == false) {
+      getInternetConnection();
+      //await getInternetConnection();
 
-    //creating a database reference
-    DatabaseReference referenceData = FirebaseDatabase.instance.reference();
+      //creating a database reference
+      DatabaseReference referenceData = FirebaseDatabase.instance.reference();
 
-    //getting the data from database were address is
-    //equals to users current location
-    await referenceData
-        .child("Workers")
-        .orderByChild("NearbyLocation") //remove order by child
-        //and order by to display all workers
-        .once()
-        .then((DataSnapshot snapshot) {
-      //clear the previous stored datalist
-      dataList.clear();
+      //getting the data from database were address is
+      //equals to users current location
+      await referenceData
+          .child("Workers")
+          .orderByChild("NearbyLocation") //remove order by child
+          //and order by to display all workers
+          .once()
+          .then((DataSnapshot snapshot) {
+        //clear the previous stored datalist
+        dataList.clear();
 
-      //getting the keys (index) and values from snapshot
-      var keys = snapshot.value.keys;
-      var values = snapshot.value;
+        //getting the keys (index) and values from snapshot
+        var keys = snapshot.value.keys;
+        var values = snapshot.value;
 
-      for (var key in keys) {
-        //since firebase database is case sensitive
-        //and geocoder only returns data first word capital. For eg. Kusunti
-        //compare the database nearbylocation to address
-        //and return the data even if the location is saved on small case in database (kusunti)
-        if (values[key]["NearbyLocation"] == address ||
-            values[key]["NearbyLocation"] == smallFirst(address)) {
-          //if category is plumber
-          if (values[key]["Category"] == "Plumber" ||
-              values[key]["Category"] == "plumber") {
-            //fetch all data of the plumbers from database
-            //who are nearby the current location of the user
-            //and add to Data class constructor
-            Data data = new Data(
-                values[key]["Category"],
-                values[key]["Name"],
-                values[key]["Address"],
-                values[key]["PhoneNumber"],
-                values[key]["URL"]);
-            //then add the value to the data list
-            dataList.add(data);
+        for (var key in keys) {
+          //since firebase database is case sensitive
+          //and geocoder only returns data first word capital. For eg. Kusunti
+          //compare the database nearbylocation to address
+          //and return the data even if the location is saved on small case in database (kusunti)
+          if (values[key]["NearbyLocation"] == address ||
+              values[key]["NearbyLocation"] == smallFirst(address)) {
+            //if category is plumber
+            if (values[key]["Category"] == "Plumber" ||
+                values[key]["Category"] == "plumber") {
+              //fetch all data of the plumbers from database
+              //who are nearby the current location of the user
+              //and add to Data class constructor
+              Data data = new Data(
+                  values[key]["Category"],
+                  values[key]["Name"],
+                  values[key]["Address"],
+                  values[key]["PhoneNumber"],
+                  values[key]["URL"]);
+              //then add the value to the data list
+              dataList.add(data);
+            }
           }
         }
-      }
-      //print("Snapshot Value${snapshot.value}");
-      print(dataList[0].databaseAddress);
-    });
+        //print("Snapshot Value${snapshot.value}");
+        print(dataList[0].databaseAddress);
+      });
 
-    //return the data list
-    return dataList;
+      //return the data list
+      return dataList;
+    }
+    //else if the user is searching
+    //only return the searched data
+    //from defined category
+    else if (searching == true) {
+      DatabaseReference searchRef =
+          FirebaseDatabase.instance.reference().child("Workers");
+      searchRef.once().then((DataSnapshot snapShot) {
+        dataList.clear();
+        var keys = snapShot.value.keys;
+        var values = snapShot.value;
+
+        for (var key in keys) {
+          Data data = new Data(
+              capitalFirst(values[key]["Category"]),
+              capitalFirst(values[key]["Name"]),
+              capitalFirst(values[key]["Address"]),
+              capitalFirst(values[key]["PhoneNumber"]),
+              values[key]["URL"]);
+          //since firebase database is case sensitive
+          //and geocoder only returns data first word capital. For eg. Kusunti
+          //compare the database nearbylocation to address
+          //and return the data even if the location is saved on small case in database (kusunti)
+          if (values[key]["NearbyLocation"] == address ||
+              values[key]["NearbyLocation"] == smallFirst(address)) {
+            //if category is plumber
+            if (values[key]["Category"] == "Plumber" ||
+                values[key]["Category"] == "plumber") {
+              //since the values are exactly compared and is case sensitive
+              //so if the the first letter of databaseAddress is capital and the first letter of search textfield is also capital the condition becomes true
+              //and if the first letter of search text field is in small then convert the first letter to capital case, now the condition becomes true
+              if (data.databaseAddress!.contains(searchText) ||
+                  data.databaseAddress!.contains(capitalFirst(searchText)) ||
+                  data.databaseName!.contains(searchText) ||
+                  data.databaseName!.contains(capitalFirst(searchText))) {
+                dataList.add(data);
+              }
+            }
+            Timer(Duration(seconds: 1), () {
+              setState(() {});
+            });
+          }
+        }
+      });
+      return dataList;
+    }
   }
 
   //capitalize first word of each. For eg: hello world to Hello World
-  String capitalFirst(String location) {
-    if (location.length <= 1) {
-      return location.toUpperCase();
+  String capitalFirst(String text) {
+    if (text.length <= 1) {
+      return text.toUpperCase();
     }
 
     // Split string into multiple words
-    final List<String> words = location.split(' ');
+    final List<String> words = text.split(' ');
 
     // Capitalize first letter of each words
     final capitalizedWords = words.map((word) {
@@ -284,14 +341,14 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
     return capitalizedWords.join(' ');
   }
 
-//capitalize first word of each. For eg: hello world to Hello World
-  String smallFirst(String location) {
-    if (location.length <= 1) {
-      return location.toLowerCase();
+  //lower case the first word of each. For eg: Hello World to hello world
+  String smallFirst(String text) {
+    if (text.length <= 1) {
+      return text.toLowerCase();
     }
 
     // Split string into multiple words
-    final List<String> words = location.split(' ');
+    final List<String> words = text.split(' ');
 
     // Capitalize first letter of each words
     final capitalizedWords = words.map((word) {
@@ -312,7 +369,10 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
 
   unfocus() {
     currentFocus = FocusScope.of(context);
-
+    //once the search field
+    setState(() {
+      searchText = "";
+    });
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
       setState(() {
@@ -646,7 +706,7 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
           duration: Duration(milliseconds: 250),
           height: 60,
           //setting the width of the search button
-          width: _searchFolded ? 56 : size.width * 0.55,
+          width: _searchFolded ? 56 : size.width * 0.80,
           decoration: _searchFolded
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(32),
@@ -678,11 +738,32 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                                 color: kPrimarySecondColor),
                             textCapitalization: TextCapitalization.words,
                             decoration: InputDecoration(
-                              hintText: 'Search',
+                              hintText: 'Search for Name or Location',
                               hintStyle: GoogleFonts.varelaRound(
                                   color: kPrimarySecondColor),
                               border: InputBorder.none,
                             ),
+                            //checking for textfield changes
+                            onChanged: (text) {
+                              //if search textfield text is not empty
+                              if (text != "") {
+                                //set searching equals to true
+                                //and set the textfield text to seachText variable
+                                setState(() {
+                                  searching = true;
+                                  searchText = text;
+                                });
+                              }
+                              //else if search text field is empty
+                              else {
+                                //set searching equals to false
+
+                                setState(() {
+                                  searching = false;
+                                });
+                              }
+                              //print("------searching-------$searching");
+                            },
                           )
                         : null),
               )),
@@ -709,11 +790,41 @@ class _NearbyPlumbersListState extends State<NearbyPlumbersLists> {
                                   Icons.close,
                                   color: kBlackColor,
                                 )),
-                      onTap: () {
+                      //search button on tap
+                      onTap: () async {
                         FocusScope.of(context).requestFocus(focusNode);
-                        setState(() {
-                          _searchFolded = !_searchFolded;
-                        });
+                        await getInternetConnection();
+                        if (connection == true) {
+                          setState(() {
+                            _searchFolded = !_searchFolded;
+                          });
+                          //if the user closes the search text field
+                          //se the searchText to empty
+                          //so that all of the data can be displayed again
+                          if (_searchFolded) {
+                            setState(() {
+                              searchText = "";
+                            });
+                          }
+                        } else {
+                          //display error
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                duration: const Duration(milliseconds: 1500),
+                                backgroundColor: Colors.redAccent,
+                                content: Text("No Internet Connectivity",
+                                    style: TextStyle(
+                                        fontSize: 16.0, color: Colors.white),
+                                    textAlign: TextAlign.center),
+                                shape: StadiumBorder(),
+                                behavior: SnackBarBehavior.floating,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                              ),
+                            );
+                        }
                       }),
                 ),
               ),
